@@ -1,0 +1,24 @@
+.emulator {
+    .emulator__display {
+        border: 1px solid white;
+        width: 320px;
+        height: 160px;
+        box-sizing: content-box;
+    }
+
+    .emulator__controls {
+        margin-bottom: 1em;
+
+        button:not(:last-child) {
+            margin-right: 0.5em;
+        }
+    }
+}
+
+.register-value {
+    transition: background-color 300ms;
+
+    &--updated {
+        background-color: #f1b70e;
+    }
+}
