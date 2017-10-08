@@ -16,9 +16,15 @@
 }
 
 .register-value {
-    transition: background-color 300ms;
+    transition: background-color 500ms;
 
     &--updated {
         background-color: #f1b70e;
     }
+}
+
+.log {
+    white-space: pre;
+    overflow: scroll;
+    max-height: 400px;
 }
