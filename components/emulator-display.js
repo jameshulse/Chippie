@@ -61,6 +61,10 @@ export default class EmulatorDisplay extends React.Component {
             this.logContainer.scrollTop = this.logContainer.scrollHeight;
         });
     }
+
+    reset() {
+        this.emulator.load(this.props.rom);
+    }
     
     render() {
         return (
@@ -72,10 +76,11 @@ export default class EmulatorDisplay extends React.Component {
                         <div className="emulator__controls">
                             {
                                 this.state.isRunning ?
-                                    <button onClick={this.stop.bind(this)} className="button is-danger">Stop</button>
+                                    <button onClick={this.stop.bind(this)} className="button is-success">Pause</button>
                                   : <button onClick={this.run.bind(this)} className="button is-success">Run</button>
                             }
                             <button disabled={this.state.isRunning} onClick={this.step.bind(this)} className="button is-warning">Step</button>
+                            <button disabled={this.state.isRunning} onClick={this.reset.bind(this)} className="button is-danger">Reset</button>
                         </div>
 
                         <div className="emulator__display">
