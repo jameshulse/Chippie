@@ -10,6 +10,7 @@ export default class EmulatorDisplay extends React.Component {
         this.emulator = new Emulator();
         this.runInterval = null;
         this.logContainer = null;
+        this.clockDelayMs = 500;
 
         if (this.props.rom) {
             this.emulator.load(this.props.rom);
@@ -36,7 +37,7 @@ export default class EmulatorDisplay extends React.Component {
         }), () => {
             this.runInterval = setInterval(() => {
                 this.step();
-            }, 500);
+            }, this.clockDelayMs);
         });
     }
 
@@ -65,7 +66,7 @@ export default class EmulatorDisplay extends React.Component {
     reset() {
         this.emulator.load(this.props.rom);
     }
-    
+
     render() {
         return (
             <div className="emulator">
@@ -81,6 +82,7 @@ export default class EmulatorDisplay extends React.Component {
                             }
                             <button disabled={this.state.isRunning} onClick={this.step.bind(this)} className="button is-warning">Step</button>
                             <button disabled={this.state.isRunning} onClick={this.reset.bind(this)} className="button is-danger">Reset</button>
+                            <input disabled={this.state.isRunning} className="input" type="text" onChange={(e) => this.clockDelayMs = e.target.value} defaultValue={this.clockDelayMs} />
                         </div>
 
                         <div className="emulator__display">
@@ -95,7 +97,9 @@ export default class EmulatorDisplay extends React.Component {
                     <div className="column is-third">
                         <h6 className="title is-size-6">Log</h6>
                         <div className="log" ref={log => this.logContainer = log}>
-                            { this.state.log && this.state.log.map(line => <p>{line}</p>) }
+                            {
+                                this.state.log && this.state.log.map((line, i) => <p key={i}>{line}</p>)
+                            }
                         </div>
                     </div>
                 </div>

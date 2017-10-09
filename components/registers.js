@@ -7,14 +7,14 @@ export default ({ registers, className = '' }) => {
         className
     );
 
-    const registerRow = (register) => {
+    const registerRow = (register, index) => {
         const registerClasses = classNames(
             'register-value',
             { 'register-value--updated': register.updated }
         );
 
         return (
-            <tr>
+            <tr key={index}>
                 <td>{register.name}</td>
                 <td className={registerClasses}>{register.value}</td>
             </tr>

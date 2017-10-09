@@ -28,3 +28,7 @@
     overflow: scroll;
     max-height: 400px;
 }
+
+input[type=text] {
+    max-width: 70px; // TODO: give the target input a proper class
+}
