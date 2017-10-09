@@ -1,4 +1,8 @@
 .emulator {
+    .column {
+        flex: 0 0 auto; // Don't wrap
+    }
+
     .emulator__display {
         border: 1px solid white;
         width: 320px;
