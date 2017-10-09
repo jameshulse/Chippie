@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  web:
+    image: 127.0.0.1:5000/chippie-web
+    build: .
+    ports:
+      - 3000
+    networks:
+      infrastructure:
+        aliases:
+          - "chippie-web"
+    hostname: "chippie-web"
+    env_file:
+      - .env
+    restart: always
+
+networks:
+  infrastructure:
+    external:
+      name: infrastructure

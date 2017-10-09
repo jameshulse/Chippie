@@ -4,7 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "webpack-dev-server --colors --progress --hot"
+    "dev": "webpack-dev-server --colors --progress --hot",
+    "production": "webpack",
+    "start": "node server.js"
   },
   "dependencies": {
     "babel-core": "^6.26.0",
@@ -14,6 +16,7 @@
     "babel-preset-env": "^1.6.0",
     "classnames": "^2.2.5",
     "css-loader": "^0.28.7",
+    "express": "^4.16.1",
     "node-sass": "^4.5.3",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
