@@ -2,7 +2,7 @@
     "games": [
         { "name": "Airplane",  "file": "Airplane.ch8" },
         { "name": "Animal Race",  "file": "Animal Race.ch8" },
-        { "name": "Breakout",  "file": "Airplane.ch8" },
+        { "name": "Breakout",  "file": "Breakout.ch8" },
         { "name": "Pong",  "file": "Pong.ch8" },
         { "name": "Rocket Launch",  "file": "Rocket Launch.ch8" },
         { "name": "Tank",  "file": "Tank.ch8" },
@@ -14,6 +14,7 @@
     ],
     "demos": [
         { "name": "Maze", "file": "Maze.ch8" },
-        { "name": "Particle Demo", "file": "Particle Demo.ch8" }
+        { "name": "Particle Demo", "file": "Particle Demo.ch8" },
+        { "name": "Stars", "file": "Stars.ch8" }
     ]
 }

@@ -10,7 +10,7 @@ export default class EmulatorDisplay extends React.Component {
         this.emulator = new Emulator();
         this.runInterval = null;
         this.logContainer = null;
-        this.clockDelayMs = 500;
+        this.clockDelayMs = 50;
 
         if (this.props.rom) {
             this.emulator.load(this.props.rom);

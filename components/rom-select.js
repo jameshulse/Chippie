@@ -13,7 +13,7 @@ export default class RomSelect extends React.Component {
 
             this.props.onSelect({
                 name,
-                data: new DataView(data)
+                data
             });
         });
     }
@@ -27,7 +27,7 @@ export default class RomSelect extends React.Component {
         reader.onload = () => {
             this.props.onSelect({
                 name: file.name,
-                data: new DataView(reader.result)
+                data: reader.result
             });
         };
     }
