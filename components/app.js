@@ -20,18 +20,19 @@ export default class App extends React.Component {
 
     render() {
         return (
-            <div className="container">
-                <section className="section">
-                    <h1 className="title">Chippie</h1>
+            <div>
+                <nav className="navbar is-radiusless" role="navbar">
+                    <div className="navbar-brand">
+                        <h2 className="title navbar-item is-size-2">Chippie</h2>
+                    </div>
+                </nav>
+                <div className="container">
                     {
                         this.state.rom ?
                             <Emulator rom={this.state.rom} />
-                          : <div>
-                                <p>No rom selected</p>
-                                <RomSelect onSelect={this.romSelected.bind(this)} />
-                          </div>
+                          : <RomSelect onSelect={this.romSelected.bind(this)} />
                     }
-                </section>
+                </div>
             </div>
         );
     }

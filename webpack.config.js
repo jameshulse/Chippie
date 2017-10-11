@@ -18,7 +18,7 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.js', '.jsx', '.scss', '.css']
+        extensions: ['.js', '.jsx', '.scss', '.css', '.json']
     },
     plugins: [
         new webpack.IgnorePlugin(/.js.map$/)

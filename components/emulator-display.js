@@ -69,7 +69,7 @@ export default class EmulatorDisplay extends React.Component {
 
     render() {
         return (
-            <div className="emulator">
+            <section className="section emulator">
                 <div className="columns">
                     <div className="column is-third">
                         <h5 className="title is-size-5">{ this.props.rom.name }</h5>
@@ -103,7 +103,7 @@ export default class EmulatorDisplay extends React.Component {
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         );
     }
 }
