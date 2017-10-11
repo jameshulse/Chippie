@@ -72,7 +72,9 @@ export default class EmulatorDisplay extends React.Component {
             <section className="section emulator">
                 <div className="columns">
                     <div className="column is-third">
-                        <h5 className="title is-size-5">{ this.props.rom.name }</h5>
+                        <button onClick={this.props.changeRom} className="button is-link is-pulled-right">Change ROM</button>
+
+                        <h3 className="title is-size-3">{ this.props.rom.name }</h3>
                         
                         <div className="emulator__controls">
                             {
@@ -82,18 +84,20 @@ export default class EmulatorDisplay extends React.Component {
                             }
                             <button disabled={this.state.isRunning} onClick={this.step.bind(this)} className="button is-warning">Step</button>
                             <button disabled={this.state.isRunning} onClick={this.reset.bind(this)} className="button is-danger">Reset</button>
-                            <input disabled={this.state.isRunning} className="input" type="text" onChange={(e) => this.clockDelayMs = e.target.value} defaultValue={this.clockDelayMs} />
+                            <input disabled={this.state.isRunning} className="input" type="number" onChange={(e) => this.clockDelayMs = e.target.value} defaultValue={this.clockDelayMs} />
                         </div>
 
                         <div className="emulator__display">
                             <Screen width={320} height={160} pixels={this.state.screen} />
                         </div>
                     </div>
+
                     <div className="column is-third">
                         <h6 className="title is-size-6">Registers</h6>
                         <Registers className="is-pulled-left" registers={this.emulator.registers.slice(0, 8)} />
                         <Registers registers={this.emulator.registers.slice(8)} />
                     </div>
+
                     <div className="column is-third">
                         <h6 className="title is-size-6">Log</h6>
                         <div className="log" ref={log => this.logContainer = log}>

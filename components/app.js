@@ -18,6 +18,13 @@ export default class App extends React.Component {
         }));
     }
 
+    clearRom() {
+        this.setState((prev) => ({
+            ...prev,
+            rom: null
+        }));
+    }
+
     render() {
         return (
             <div>
@@ -29,7 +36,7 @@ export default class App extends React.Component {
                 <div className="container">
                     {
                         this.state.rom ?
-                            <Emulator rom={this.state.rom} />
+                            <Emulator rom={this.state.rom} changeRom={this.clearRom.bind(this)} />
                           : <RomSelect onSelect={this.romSelected.bind(this)} />
                     }
                 </div>
