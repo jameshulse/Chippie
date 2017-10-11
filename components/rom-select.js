@@ -1,4 +1,5 @@
 import React from 'react';
+import FileSelect from './file-select';
 import romList from '../roms/list.json';
 
 export default class RomSelect extends React.Component {
@@ -6,7 +7,7 @@ export default class RomSelect extends React.Component {
         super(props);
     }
 
-    async loadRom(name, url) {
+    async loadRomFromUrl(name, url) {
         fetch(url).then(async (response) => {
             let data = await response.arrayBuffer();
 
@@ -15,6 +16,20 @@ export default class RomSelect extends React.Component {
                 data: new DataView(data)
             });
         });
+    }
+
+    async loadRomFromFile(event) {
+        let file = event.target.files[0];
+        let reader = new FileReader();
+
+        reader.readAsArrayBuffer(file);
+
+        reader.onload = () => {
+            this.props.onSelect({
+                name: file.name,
+                data: new DataView(reader.result)
+            });
+        };
     }
 
     render() {
@@ -34,7 +49,7 @@ export default class RomSelect extends React.Component {
             let url = `/roms/${category.toLowerCase()}/${item.file}`;
 
             return (
-                <a key={index} className="panel-block" onClick={() => this.loadRom(item.name, url)}>
+                <a key={index} className="panel-block" onClick={() => this.loadRomFromUrl(item.name, url)}>
                     { item.name }
                 </a>
             );
@@ -48,6 +63,8 @@ export default class RomSelect extends React.Component {
                     {renderCategory('Programs', romList.programs)}
                     {renderCategory('Demos', romList.demos)}
                 </div>
+                <h1 className="title is-size-4">Load From File</h1>
+                <FileSelect onChange={this.loadRomFromFile.bind(this)} />
             </section>
         )
     }
