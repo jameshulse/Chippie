@@ -124,7 +124,7 @@ export default class Emulator {
         } else if(topByte === 0x7) { // Add NN to VX (0x7XNN)
             let register = this.registers[x];
 
-            register.value += nn % 256; // 8 bit registers
+            register.value = (register.value + nn) % 256; // 8 bit registers
             register.updated = true;
             
             log += `Add ${nn} to ${register.name}`;
