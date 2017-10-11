@@ -1,4 +1,5 @@
 import { hex } from './utils';
+import Register from './register';
 
 const CLOCK_SPEED = 540; // hertz
 const DELAY_DECAY_RATE = 60; // hertz
@@ -7,12 +8,13 @@ const MEMORY_START = 0x200;
 
 export default class Emulator {
     constructor() {
-        this.registers = Array(16).fill(null).map((_, i) => ({
-            name: `V${i.toString(16)}`.toUpperCase(),
-            value: 0
-        }));
+        this.registers = Array(16).fill(null).map((_, i) => {
+            let name = `V${i.toString(16)}`.toUpperCase();
 
-        this.memoryRegister = { name: 'I', value: 0 };
+            return new Register(name);
+        });
+
+        this.memoryRegister = new Register('I');
         this.delayTimer = 0;
 
         this.registers.push(this.memoryRegister);
@@ -115,40 +117,72 @@ export default class Emulator {
                 log += `No skip as ${registerX.name} !== ${registerY.name}`;
             }
         } else if (topByte === 0x6) { // Assign register (0x6XNN)
-            let register = this.registers[x];
+            this.registers[x].value = nn;
 
-            register.value = nn;
-            register.updated = true;
-
-            log += `Set ${register.name} to ${nn}`;
+            log += `Set ${this.registers[x].name} to ${nn}`;
         } else if(topByte === 0x7) { // Add NN to VX (0x7XNN)
             let register = this.registers[x];
 
             register.value = (register.value + nn) % 256; // 8 bit registers
-            register.updated = true;
             
             log += `Add ${nn} to ${register.name}`;
         } else if (topByte === 0x8) { // Assign VX to VY
-            // TODO: There are other 0x8 functions
+            switch (n) {
+                case 0: // Set VX to the value of VY
+                    this.registers[x].value = this.registers[y].value;
 
-            let registerX = this.registers[x];
-            let registerY = this.registers[y];
+                    log += `Set ${registerX.name} to value of ${registerY.name}`;
+                    break;
+                case 1: // Sets VX to VX | VY. (Bitwise OR operation)
+                    this.registers[x].value |= this.registers[y].value;
 
-            registerX.value = registerY.value;
-            registerX.updated = true;
+                    log += `Bitwise: ${this.registers[x].name} OR ${this.registers[y].name}`;
+                    break;
+                case 2: // Sets VX to VX & VY. (Bitwise AND operation)
+                    this.registers[x].value &= this.registers[y].value;
 
-            log += `Set ${registerX.name} to value of ${registerY.name}`;
+                    log += `Bitwise: ${this.registers[x].name} AND ${this.registers[y].name}`;
+                    break;
+                case 3: // Sets VX to VX xor VY. (Bitwise XOR operation)
+                    this.registers[x].value ^= this.registers[y].value;
+
+                    log += `Bitwise: ${this.registers[x].name} XOR ${this.registers[y].name}`;
+                    break;
+                case 4:
+                    this.registers[x].value += this.registers[y].value;
+
+                    this.registers[0xF0].value = 0; // TODO: Somehow set carry flag
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
+                case 7:
+                    break;
+                case 0xE:
+                    break;
+            }
+        } else if (topByte === 0x9) {
+            if (this.registers[x].value !== this.registers[y].value) {
+                this.programCounter += 2;
+
+                log += `Skipping as ${this.registers[x].name} === ${this.registers[y].name}`;
+            } else {
+                log += `Not skipping as ${this.registers[x].name} !== ${this.registers[y].name}`;
+            }
         } else if (topByte === 0xA) { // Assign memory register (0xANNN)
             this.memoryRegister.value = nnn;
-            this.memoryRegister.updated = true;
 
             log += `Set I to ${nnn}`;
+        } else if (topByte === 0xB) {
+            this.programCounter = this.registers[0].value + nnn;
+
+            log += `Jump to V0 + ${nnn}: ${this.programCounter}`;
         } else if (topByte === 0xC) { // Rand (0xCXNN)
             let register = this.registers[x];
             let rand = Math.floor(Math.random() * 255);
 
             register.value = nn & rand;
-            register.updated = true;
 
             log += `Randomise ${register.name} with ${nn} & rand:${rand}`;
         } else if(topByte === 0xD) { // Display! 0xDXYN
@@ -170,7 +204,6 @@ export default class Emulator {
 
                         if (this.screen[screenY][screenX] === 1) { // Collision
                             this.registers[0xF].value = 1;
-                            this.registers[0xF].updated = true;
                         }
 
                         this.screen[screenY][screenX] ^= 1;
@@ -185,7 +218,6 @@ export default class Emulator {
             let register = this.registers[x];
 
             register.value = this.delayTimer;
-            register.updated = true;
 
             log += `Set ${register.name} to delay timer`;
         } else if ((opCode & 0xF015) === 0xF015) { // Set delay timer (FX15)
@@ -196,7 +228,6 @@ export default class Emulator {
             log += `Set delay timer to ${register.name}`;
         } else if ((opCode & 0xF01E) === 0xF01E) { // Add X to I(0xFX1E)
             this.memoryRegister.value += x;
-            this.memoryRegister.updated = true;
 
             log += `Add ${x} to I`;
         } else {
