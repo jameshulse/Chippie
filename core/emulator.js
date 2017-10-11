@@ -6,6 +6,25 @@ const DELAY_DECAY_RATE = 60; // hertz
 const DELAY_RATIO = CLOCK_SPEED / DELAY_DECAY_RATE; // delays per clock cycle
 const MEMORY_START = 0x200;
 
+const hexFont = [
+    [0xF0, 0x90, 0x90, 0x90, 0xF0], // 0
+    [0x20, 0x60, 0x20, 0x20, 0x70], // 1
+    [0xF0, 0x10, 0xF0, 0x80, 0xF0], // 2
+    [0xF0, 0x10, 0xF0, 0x10, 0xF0], // 3
+    [0x90, 0x90, 0xF0, 0x10, 0x10], // 4
+    [0xF0, 0x80, 0xF0, 0x10, 0xF0], // 5
+    [0xF0, 0x80, 0xF0, 0x90, 0xF0], // 6
+    [0xF0, 0x10, 0x20, 0x40, 0x40], // 7
+    [0xF0, 0x90, 0xF0, 0x90, 0xF0], // 8
+    [0xF0, 0x90, 0xF0, 0x10, 0xF0], // 9
+    [0xF0, 0x90, 0xF0, 0x90, 0x90], // A
+    [0xE0, 0x90, 0xE0, 0x90, 0xE0], // B
+    [0xF0, 0x80, 0x80, 0x80, 0xF0], // C
+    [0xE0, 0x90, 0x90, 0x90, 0xE0], // D
+    [0xF0, 0x80, 0xF0, 0x80, 0xF0], // E
+    [0xF0, 0x80, 0xF0, 0x80, 0x80], // F
+];
+
 export default class Emulator {
     constructor() {
         this.registers = Array(16).fill(null).map((_, i) => {
@@ -15,7 +34,9 @@ export default class Emulator {
         });
 
         this.memoryRegister = new Register('I');
+
         this.delayTimer = 0;
+        this.soundTimer = 0;
 
         this.registers.push(this.memoryRegister);
         this.loaded = false;
@@ -26,6 +47,7 @@ export default class Emulator {
 
         let romMemory = new Uint8Array(rom.data.byteLength + MEMORY_START);
 
+        romMemory.set(new Uint8Array(hexFont.reduce((font, char) => font.concat(char))));
         romMemory.set(new Uint8Array(rom.data), MEMORY_START);
 
         this.memory = new DataView(romMemory.buffer);
@@ -131,7 +153,7 @@ export default class Emulator {
                 case 0: // Set VX to the value of VY
                     this.registers[x].value = this.registers[y].value;
 
-                    log += `Set ${registerX.name} to value of ${registerY.name}`;
+                    log += `Set ${this.registers[x].name} to value of ${this.registers[y].name}`;
                     break;
                 case 1: // Sets VX to VX | VY. (Bitwise OR operation)
                     this.registers[x].value |= this.registers[y].value;
@@ -151,15 +173,32 @@ export default class Emulator {
                 case 4:
                     this.registers[x].value += this.registers[y].value;
 
-                    this.registers[0xF0].value = 0; // TODO: Somehow set carry flag
+                    this.registers[0xF].value = 0; // TODO: Somehow set carry flag
+
+                    log += `Add ${this.registers[y].name} to ${this.registers[x].name}`;
                     break;
                 case 5:
+                    this.registers[x].value -= this.registers[y].value;
+
+                    this.registers[0xF].value = 0; // TODO: Somehow set carry flag
+
+                    log += `Subtract ${this.registers[y].name} from ${this.registers[x].name}`;
+                    
                     break;
-                case 6:
+                case 6: // Sets VX to VY right shifted by 1
+                    this.registers[0xF].value = this.registers[y].value & 0x000F;
+                    this.registers[x].value = this.registers[y].value >>> 1;
+
+                    log += `Bitwise: ${this.registers[y].name} >>> 1`;
                     break;
-                case 7:
+                case 7: // Sets VX to VY - VX
+                    this.registers[x].value = this.registers[y].value - this.registers[x].value;
+                    log += `Subtract ${this.registers[x].name} from ${this.registers[y].name}`;
                     break;
-                case 0xE:
+                case 0xE: // Sets VX to VY shifted to the left by 1
+                    this.registers[0xF].value = (this.registers[y].value & 0xF000) >>> 12;
+                    this.registers[x].value = this.registers[y].value << 1;
+                    log += `Bitwise: ${this.registers[y].name} <<< 1`;
                     break;
             }
         } else if (topByte === 0x9) {
@@ -212,24 +251,49 @@ export default class Emulator {
             }
             
             log += `Display sprite at (${x},${y}) of height ${spriteHeight} from I`;
-        } else if(topByte === 0xE) { // Handle keyboard input
-            debugger;
-        } else if ((opCode & 0xF007) === 0xF007) { // Get delay timer (0xFX07)
-            let register = this.registers[x];
-
-            register.value = this.delayTimer;
-
-            log += `Set ${register.name} to delay timer`;
-        } else if ((opCode & 0xF015) === 0xF015) { // Set delay timer (FX15)
-            let register = this.registers[x];
-
-            this.delayTimer = register.value;
-
-            log += `Set delay timer to ${register.name}`;
-        } else if ((opCode & 0xF01E) === 0xF01E) { // Add X to I(0xFX1E)
-            this.memoryRegister.value += x;
-
-            log += `Add ${x} to I`;
+        } else if (topByte === 0xE) { // Handle keyboard input
+            if (nn === 0x9E) { // Skip the next instruction if the key at X is pressed
+                debugger;
+            } else if (nn === 0x9E) { // Skip the next instruction if the key at X isn't pressed
+                debugger;
+            }
+        } else if (topByte === 0xF) {
+            switch (nn) {
+                case 0x07: // Get value from delay timer (0xFX07)
+                    this.registers[x].value = this.delayTimer;
+                    log += `Set ${this.registers[x].name} to delay timer`;
+                    break;
+                case 0x0A: // Await for key press
+                    break;
+                case 0x15:
+                    this.delayTimer = this.registers[x].value;
+                    log += `Set delay timer to ${this.registers[x].name}`;
+                    break;
+                case 0x18:
+                    this.soundTimer = this.registers[x].value;
+                    log += `Set sound timer to ${this.registers[x].name}`;
+                    break;
+                case 0x1E:
+                    this.memoryRegister.value += x;
+                    log += `Add ${x} to I`;
+                    break;
+                case 0x29: // Set I to character font location of register X
+                    this.memoryRegister.value = this.registers[x].value * 5;
+                    log += `Set memory location for character ${hex(this.registers[x].value, 1)}`;
+                    break;
+                case 0x55: // reg_dump - Store registers V0 to VX to memory
+                    for(let i = 0; i <= x; i++) {
+                        this.memory.setInt16(this.memoryRegister.value + i, this.registers[i].value);
+                    }
+                    log += `Storing values V0 to V${x} in memory`;
+                    break;
+                case 0x65: // reg_load Store registers V0 to VX to memory
+                    for (let i = 0; i <= x; i++) {
+                        this.registers[i].value = this.memory.getInt16(this.memoryRegister.value + i);
+                    }
+                    log += `Storing values V0 to V${x} in memory`;
+                    break;
+            }
         } else {
             debugger;
         }

@@ -67,12 +67,21 @@ export default class EmulatorDisplay extends React.Component {
         this.emulator.load(this.props.rom);
     }
 
+    changeRom() {
+        this.setState((prev) => ({
+            ...prev,
+            isRunning: false
+        }), () => {
+            this.props.changeRom();
+        });
+    }
+
     render() {
         return (
             <section className="section emulator">
                 <div className="columns">
                     <div className="column is-third">
-                        <button onClick={this.props.changeRom} className="button is-link is-pulled-right">Change ROM</button>
+                        <button onClick={this.changeRom.bind(this)} className="button is-link is-pulled-right">Change ROM</button>
 
                         <h3 className="title is-size-3">{ this.props.rom.name }</h3>
                         
