@@ -102,7 +102,7 @@ export default class EmulatorDisplay extends React.Component {
                         <h6 className="title is-size-6">Log</h6>
                         <div className="log" ref={log => this.logContainer = log}>
                             {
-                                this.state.log && this.state.log.map((line, i) => <p key={i}>{line}</p>)
+                                this.state.log && this.state.log.slice(-200).map((line, i) => <p key={i}>{line}</p>)
                             }
                         </div>
                     </div>
