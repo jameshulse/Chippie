@@ -13,13 +13,17 @@ export default class Screen extends React.Component {
         this.pixelHeight = props.height / SCREEN_HEIGHT;
     }
 
+    clear() {
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(0, 0, this.props.width, this.props.height);
+    }
+
     componentDidUpdate() {
         if (!this.props.pixels) {
             return;
         }
-        
-        this.ctx.fillStyle = 'black';
-        this.ctx.fillRect(0, 0, this.props.width, this.props.height);
+
+        this.clear();
         
         this.ctx.fillStyle = 'white';
 

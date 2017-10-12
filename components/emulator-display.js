@@ -42,12 +42,16 @@ export default class EmulatorDisplay extends React.Component {
         });
     }
 
-    stop() {
+    stop(onStop) {
         this.setState((prev) => ({
             ...prev,
             isRunning: false
         }), () => {
             clearInterval(this.runInterval);
+
+            if (onStop) {
+                onStop();
+            }
         });
     }
 
@@ -69,8 +73,9 @@ export default class EmulatorDisplay extends React.Component {
     }
 
     changeRom() {
-        this.stop();
-        this.props.changeRom();
+        this.stop(() => {
+            this.props.changeRom();
+        });
     }
 
     render() {
@@ -85,11 +90,11 @@ export default class EmulatorDisplay extends React.Component {
                         <div className="emulator__controls">
                             {
                                 this.state.isRunning ?
-                                    <button onClick={this.stop.bind(this)} className="button is-success">Pause</button>
-                                  : <button onClick={this.run.bind(this)} className="button is-success">Run</button>
+                                    <button onClick={() => this.stop()} className="button is-success">Pause</button>
+                                  : <button onClick={() => this.run()} className="button is-success">Run</button>
                             }
-                            <button disabled={this.state.isRunning} onClick={this.step.bind(this)} className="button is-warning">Step</button>
-                            <button disabled={this.state.isRunning} onClick={this.reset.bind(this)} className="button is-danger">Reset</button>
+                            <button disabled={this.state.isRunning} onClick={() => this.step()} className="button is-warning">Step</button>
+                            <button disabled={this.state.isRunning} onClick={() => this.reset()} className="button is-danger">Reset</button>
                             <input disabled={this.state.isRunning} className="input" type="number" onChange={(e) => this.clockDelayMs = e.target.value} defaultValue={this.clockDelayMs} />
                         </div>
 
