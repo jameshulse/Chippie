@@ -1,6 +1,7 @@
 import React from 'react';
 import Registers from './registers';
 import Screen from './screen';
+import Log from './log';
 import Emulator from '../core/emulator';
 
 export default class EmulatorDisplay extends React.Component {
@@ -59,7 +60,7 @@ export default class EmulatorDisplay extends React.Component {
             screen: emulatorState.screen,
             log: emulatorState.log
         }), () => {
-            this.logContainer.scrollTop = this.logContainer.scrollHeight;
+            this.logContainer.scrollToBottom();
         });
     }
 
@@ -68,12 +69,8 @@ export default class EmulatorDisplay extends React.Component {
     }
 
     changeRom() {
-        this.setState((prev) => ({
-            ...prev,
-            isRunning: false
-        }), () => {
-            this.props.changeRom();
-        });
+        this.stop();
+        this.props.changeRom();
     }
 
     render() {
@@ -109,11 +106,7 @@ export default class EmulatorDisplay extends React.Component {
 
                     <div className="column is-third">
                         <h6 className="title is-size-6">Log</h6>
-                        <div className="log" ref={log => this.logContainer = log}>
-                            {
-                                this.state.log && this.state.log.slice(-200).map((line, i) => <p key={i}>{line}</p>)
-                            }
-                        </div>
+                        <Log ref={(c) => this.logContainer = c} log={this.state.log} />
                     </div>
                 </div>
             </section>
