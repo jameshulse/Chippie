@@ -12,7 +12,6 @@ export default class EmulatorDisplay extends React.Component {
 
         this.emulator = new Emulator(this.playSound.bind(this));
         this.runInterval = null;
-        this.logContainer = null;
         this.clockDelayMs = 50;
 
         if (this.props.rom) {
@@ -132,7 +131,7 @@ export default class EmulatorDisplay extends React.Component {
 
                     <div className="column is-third">
                         <h6 className="title is-size-6">Log</h6>
-                        <Log ref={(c) => this.logContainer = c} log={this.state.log} />
+                        <Log log={this.state.log} />
                     </div>
                 </div>
             </section>
