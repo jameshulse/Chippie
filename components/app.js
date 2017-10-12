@@ -12,20 +12,16 @@ export default class App extends React.Component {
     }
 
     romSelected(rom) {
-        this.setState((prev) => ({
-            ...prev,
-            rom
-        }));
+        this.setState((prev) => ({...prev, rom}));
     }
 
     clearRom() {
-        this.setState((prev) => ({
-            ...prev,
-            rom: null
-        }));
+        this.setState((prev) => ({...prev, rom: null }));
     }
 
     render() {
+        const { rom } = this.state;
+
         return (
             <div>
                 <nav className="navbar is-radiusless" role="navbar">
@@ -35,9 +31,8 @@ export default class App extends React.Component {
                 </nav>
                 <div className="container">
                     {
-                        this.state.rom ?
-                            <Emulator rom={this.state.rom} changeRom={this.clearRom.bind(this)} />
-                          : <RomSelect onSelect={this.romSelected.bind(this)} />
+                        rom ? <Emulator rom={rom} changeRom={this.clearRom.bind(this)} />
+                            : <RomSelect onSelect={this.romSelected.bind(this)} />
                     }
                 </div>
             </div>

@@ -34,7 +34,7 @@ const keyMap = {
 }
 
 export default class Emulator {
-    constructor() {
+    constructor(playSound) {
         this.registers = Array(16).fill(null).map((_, i) => {
             let name = `V${i.toString(16)}`.toUpperCase();
 
@@ -45,6 +45,7 @@ export default class Emulator {
 
         this.delayTimer = 0;
         this.soundTimer = 0;
+        this.playSound = playSound;
 
         this.registers.push(this.memoryRegister);
         this.loaded = false;
@@ -328,9 +329,11 @@ export default class Emulator {
         if (this.soundTimer > 0) {
              if (this.instructionCount % DELAY_RATIO === 0) {
                  this.soundTimer--;
-             }
 
-             // TODO: Play sound (pluggable?)
+                 if (this.soundTimer === 0) {
+                     this.playSound();
+                 }
+             }
         }
     }
 }

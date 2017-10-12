@@ -13,7 +13,7 @@
     .emulator__controls {
         margin-bottom: 1em;
 
-        button:not(:last-child) {
+        :not(:last-child) {
             margin-right: 0.5em;
         }
     }
@@ -35,7 +35,13 @@
 }
 
 input[type=number] {
-    max-width: 90px; // TODO: give the target input a proper class
+    max-width: 70px; // TODO: give the target input a proper class
+
+    &::-webkit-inner-spin-button, 
+    &::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+    }
 }
 
 .rom-list {

@@ -7,6 +7,10 @@ export default class Log extends React.Component {
         this.container = null;
     }
 
+    componentDidUpdate(prevProps) {
+        this.scrollToBottom();
+    }
+
     scrollToBottom() {
         this.container.scrollTop = this.container.scrollHeight;
     }

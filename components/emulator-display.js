@@ -3,12 +3,14 @@ import Registers from './registers';
 import Screen from './screen';
 import Log from './log';
 import Emulator from '../core/emulator';
+import { MusicIcon, MusicOffIcon } from './icons';
+import buzzer from '../core/buzzer';
 
 export default class EmulatorDisplay extends React.Component {
     constructor(props) {
         super(props);
 
-        this.emulator = new Emulator();
+        this.emulator = new Emulator(this.playSound.bind(this));
         this.runInterval = null;
         this.logContainer = null;
         this.clockDelayMs = 50;
@@ -21,7 +23,16 @@ export default class EmulatorDisplay extends React.Component {
             isRunning: false,
             screen: null,
             registers: null,
-            log: null
+            log: null,
+            musicEnabled: true
+        }
+    }
+
+    playSound() {
+        if (this.state.musicEnabled) {
+            buzzer();
+        } else {
+            // TODO: Something visual
         }
     }
 
@@ -60,12 +71,8 @@ export default class EmulatorDisplay extends React.Component {
 
         this.setState((prev) => ({
             ...prev,
-            registers: emulatorState.registers,
-            screen: emulatorState.screen,
-            log: emulatorState.log
-        }), () => {
-            this.logContainer.scrollToBottom();
-        });
+            ...emulatorState
+        }));
     }
 
     reset() {
@@ -78,7 +85,16 @@ export default class EmulatorDisplay extends React.Component {
         });
     }
 
+    toggleMusic() {
+        this.setState((prev) => ({
+            ...prev,
+            musicEnabled: !prev.musicEnabled
+        }));
+    }
+
     render() {
+        const { isRunning, musicEnabled } = this.state;
+
         return (
             <section className="section emulator">
                 <div className="columns">
@@ -89,13 +105,18 @@ export default class EmulatorDisplay extends React.Component {
                         
                         <div className="emulator__controls">
                             {
-                                this.state.isRunning ?
+                                isRunning ?
                                     <button onClick={() => this.stop()} className="button is-success">Pause</button>
                                   : <button onClick={() => this.run()} className="button is-success">Run</button>
                             }
-                            <button disabled={this.state.isRunning} onClick={() => this.step()} className="button is-warning">Step</button>
-                            <button disabled={this.state.isRunning} onClick={() => this.reset()} className="button is-danger">Reset</button>
-                            <input disabled={this.state.isRunning} className="input" type="number" onChange={(e) => this.clockDelayMs = e.target.value} defaultValue={this.clockDelayMs} />
+                            <button disabled={isRunning} onClick={() => this.step()} className="button is-warning">Step</button>
+                            <button disabled={isRunning} onClick={() => this.reset()} className="button is-danger">Reset</button>
+                            <input disabled={isRunning} className="input" title="Step delay" type="number" onChange={(e) => this.clockDelayMs = e.target.value} defaultValue={this.clockDelayMs} />
+                            <a className="button" onClick={() => this.toggleMusic()}>
+                                <span className="icon">
+                                    { musicEnabled ? <MusicIcon /> : <MusicOffIcon /> }
+                                </span>
+                            </a>
                         </div>
 
                         <div className="emulator__display">
