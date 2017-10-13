@@ -3,6 +3,7 @@ import Registers from './registers';
 import Screen from './screen';
 import Log from './log';
 import Emulator from '../core/emulator';
+import Keyboard from '../core/keyboard';
 import { MusicIcon, MusicOffIcon } from './icons';
 import buzzer from '../core/buzzer';
 
@@ -11,6 +12,7 @@ export default class EmulatorDisplay extends React.Component {
         super(props);
 
         this.emulator = new Emulator(this.playSound.bind(this));
+        this.keyboard = new Keyboard();
         this.runInterval = null;
         this.clockDelayMs = 50;
 
@@ -41,6 +43,14 @@ export default class EmulatorDisplay extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this.keyboard.attach();
+    }
+
+    componentWillUnmount() {
+        this.keyboard.detach();
+    }
+
     run() {
         this.setState((prev) => ({
             ...prev,
@@ -66,7 +76,7 @@ export default class EmulatorDisplay extends React.Component {
     }
 
     step() {
-        let emulatorState = this.emulator.step();
+        let emulatorState = this.emulator.step(this.keyboard.getKeysDown());
 
         this.setState((prev) => ({
             ...prev,

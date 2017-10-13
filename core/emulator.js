@@ -76,7 +76,7 @@ export default class Emulator {
         this.screen = new Array(32).fill(null).map((array) => new Array(64).fill(0));
     }
 
-    step() {
+    step(keysDown) {
         if (!this.loaded) {
             throw new Error('ROM not loaded');
         }
@@ -201,7 +201,7 @@ export default class Emulator {
                     log += `Bitwise: ${this.registers[y].name} <<< 1`;
                     break;
             }
-        } else if (topByte === 0x9) {
+        } else if (topByte === 0x9) { // Skip if VX !== VY
             if (this.registers[x].value !== this.registers[y].value) {
                 this.programCounter += 2;
 
@@ -213,7 +213,7 @@ export default class Emulator {
             this.memoryRegister.value = nnn;
 
             log += `Set I to ${nnn}`;
-        } else if (topByte === 0xB) {
+        } else if (topByte === 0xB) { // Jump to NNN
             this.programCounter = this.registers[0].value + nnn;
 
             log += `Jump to V0 + ${nnn}: ${this.programCounter}`;
@@ -251,10 +251,24 @@ export default class Emulator {
             
             log += `Display sprite at (${x},${y}) of height ${spriteHeight} from I`;
         } else if (topByte === 0xE) { // Handle keyboard input
+            const key = keyMap[this.registers[x].value];
+
             if (kk === 0x9E) { // Skip the next instruction if the key at X is pressed
-                debugger;
-            } else if (kk === 0x9E) { // Skip the next instruction if the key at X isn't pressed
-                debugger;
+                if (keysDown.indexOf(key) !== -1) {
+                    this.programCounter += 2;
+
+                    log += `Skip as ${key} is pressed`;
+                } else {
+                    log += `No skip as ${key} not pressed`;
+                }
+            } else if (kk === 0xA1) { // Skip the next instruction if the key at X isn't pressed
+                if (keysDown.indexOf(key) === -1) {
+                    this.programCounter += 2;
+
+                    log += `Skip as ${key} is not pressed`;
+                } else {
+                    log += `No skip as ${key} is pressed`;
+                }
             }
         } else if (topByte === 0xF) {
             switch (kk) {
@@ -279,6 +293,12 @@ export default class Emulator {
                 case 0x29: // Set I to character font location of register X
                     this.memoryRegister.value = this.registers[x].value * 5;
                     log += `Set memory location for character ${hex(this.registers[x].value, 1)}`;
+                    break;
+                case 0x33: // Binary encoded number
+                    this.memory.setUint8(this.memoryRegister.value, Math.floor(this.registers[x].value / 100));
+                    this.memory.setUint8(this.memoryRegister.value + 1, Math.floor(this.registers[x].value % 100 / 10));
+                    this.memory.setUint8(this.memoryRegister.value + 2, Math.floor(this.registers[x].value % 100 % 10));
+                    log += `Stored binary encoded value of ${this.registers[x].name}`;
                     break;
                 case 0x55: // reg_dump - Store registers V0 to VX to memory
                     for(let i = 0; i <= x; i++) {
