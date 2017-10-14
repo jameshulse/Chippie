@@ -1,8 +1,8 @@
 export default class Register {
     constructor(name) {
         this.name = name;
-        this._value = 0;
-        this.updated = false;
+        
+        this.reset();
     }
 
     get value() {
@@ -14,5 +14,10 @@ export default class Register {
 
         this._value = value;
         this.updated = value !== prevValue;
+    }
+
+    reset() {
+        this._value = 0;
+        this.updated = false;
     }
 }

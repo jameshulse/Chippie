@@ -1,6 +1,7 @@
 import React from 'react';
 import Emulator from './emulator-display';
 import RomSelect from './rom-select';
+import Title from './title';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -26,7 +27,7 @@ export default class App extends React.Component {
             <div>
                 <nav className="navbar is-radiusless" role="navbar">
                     <div className="navbar-brand">
-                        <h2 className="title navbar-item is-size-2">Chippie</h2>
+                        <Title className="navbar-item" size={2}>Chippie</Title>
                     </div>
                 </nav>
                 <div className="container">

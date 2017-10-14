@@ -4,10 +4,11 @@ export default class Log extends React.Component {
     constructor(props) {
         super(props);
 
+        this.maxLength = props.maxLength || 200;
         this.container = null;
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate() {
         this.scrollToBottom();
     }
 
@@ -16,11 +17,12 @@ export default class Log extends React.Component {
     }
 
     render() {
+        let { log } = this.props;
+        let renderLine = (line, i) => <p key={i}>{line}</p>;
+
         return (
             <div className="log" ref={c => this.container = c}>
-                {
-                    this.props.log && this.props.log.slice(-200).map((line, i) => <p key={i}>{line}</p>)
-                }
+                { log && log.slice(-this.maxLength).map(renderLine) }
             </div>
         );
     }

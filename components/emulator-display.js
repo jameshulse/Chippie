@@ -6,6 +6,7 @@ import Emulator from '../core/emulator';
 import Keyboard from '../core/keyboard';
 import { MusicIcon, MusicOffIcon } from './icons';
 import buzzer from '../core/buzzer';
+import Title from './title';
 
 export default class EmulatorDisplay extends React.Component {
     constructor(props) {
@@ -110,7 +111,7 @@ export default class EmulatorDisplay extends React.Component {
                     <div className="column is-third">
                         <button onClick={this.changeRom.bind(this)} className="button is-link is-pulled-right">Change ROM</button>
 
-                        <h3 className="title is-size-3">{ this.props.rom.name }</h3>
+                        <Title size={3}>{ this.props.rom.name }</Title>
                         
                         <div className="emulator__controls">
                             {
@@ -134,13 +135,13 @@ export default class EmulatorDisplay extends React.Component {
                     </div>
 
                     <div className="column is-third">
-                        <h6 className="title is-size-6">Registers</h6>
+                        <Title size={6}>Registers</Title>
                         <Registers className="is-pulled-left" registers={this.emulator.registers.slice(0, 8)} />
                         <Registers registers={this.emulator.registers.slice(8)} />
                     </div>
 
                     <div className="column is-third">
-                        <h6 className="title is-size-6">Log</h6>
+                        <Title size={6}>Log</Title>
                         <Log log={this.state.log} />
                     </div>
                 </div>

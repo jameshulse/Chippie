@@ -13,6 +13,10 @@ export default class Screen extends React.Component {
         this.pixelHeight = props.height / SCREEN_HEIGHT;
     }
 
+    componentDidMount() {
+        this.ctx = this.canvas.getContext('2d');
+    }
+
     clear() {
         this.ctx.fillStyle = 'black';
         this.ctx.fillRect(0, 0, this.props.width, this.props.height);
@@ -38,10 +42,6 @@ export default class Screen extends React.Component {
                 }
             }
         }
-    }
-
-    componentDidMount() {
-        this.ctx = this.canvas.getContext('2d');
     }
 
     render() {
