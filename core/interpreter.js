@@ -5,16 +5,14 @@ export function commandMap(params) {
         case 0x0:
             switch (params.instruction) {
                 case 0x00E0:
-                    return instructions.dispClear;
+                    return instructions.dispClear();
                 case 0x00EE:
-                    return instructions.popStack;
+                    return instructions.popStack();
             }
-            break;
         case 0x1:
-            
-            break;
+            return instructions.jumpToAddress(params.nnn)
         case 0x2:
-            break;
+            return instructions.callRoutine(params.nnn)
         case 0x3:
             break;
         case 0x4:
@@ -41,6 +39,8 @@ export function commandMap(params) {
             break;
         case 0xF:
             break;
+        default:
+            return null;
     }
 }
 
@@ -56,9 +56,17 @@ export function decode(instruction) {
     };
 }
 
-export default function execute(instruction) {
+export function getCommand(instruction) {
     let params = decode(instruction);
-    let executor = commandMap[command];
+    let command = commandMap(params);
 
-    return executor(params);
+    if (!command) {
+        console.log('Unknown instruction', params);
+        
+        return null;
+    }
+
+    return command;
 }
+
+export default getCommand;

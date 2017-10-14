@@ -1,5 +1,5 @@
 import 'jest';
-import { decode, commandMap } from '../core/interpreter';
+import { decode, commandMap, getCommand } from '../core/interpreter';
 import * as instructions from '../core/instructions';
 
 describe('Decode', () => {
@@ -35,16 +35,15 @@ describe('Decode', () => {
     })
 });
 
-describe('Command mapper', () => {
-    const mapTest = (input, expected) => {
-        return () => {
-            let params = decode(input);
-            let command = commandMap(params);
-    
-            expect(command).toEqual(expected);
+describe('getCommand', () => {
+    test('Can call known command', () => {
+        let command = getCommand(0x00E0);
+        let fakeState = {
+            clearScreen: jest.fn()
         };
-    };
 
-    test('0x00E0 => dispClear', mapTest(0x00E0, instructions.dispClear));
-    test('0x00EE => popStack', mapTest(0x00EE, instructions.popStack));
+        command(fakeState);
+
+        expect(fakeState.clearScreen).toBeCalled();
+    })
 });
