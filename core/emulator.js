@@ -94,38 +94,9 @@ export default class Emulator {
             let x = (opCode & 0x0F00) >>> 8;
             let y = (opCode & 0x00F0) >>> 4;
 
-            if (topByte === 0x3) { // Skip next if VX equals NN (0x3XNN)
-                if (this.registers[x].value === kk) {
-                    this.pc += 2;
-    
-                    log += `Skip next as ${this.registers[x].name} === ${kk}`;
-                } else {
-                    log += `No skip as ${this.registers[x].name} !== ${kk}`;
-                }
-            } else if (topByte === 0x4) { // Skip next if VX != NN (0xAXNN)
-                if (this.registers[x].value !== kk) {
-                    this.pc += 2;
-    
-                    log += `Skip next as ${this.registers[x].name} !== ${kk}`;
-                } else {
-                    log += `No skip as ${this.registers[x].name} === ${kk}`;
-                }
-            } else if (topByte === 0x5) { // Skip if VX === VY (0x5XY0)
-                if (this.registers[x].value === this.registers[y].value) {
-                    this.pc += 2;
-    
-                    log += `Skip next as ${this.registers[x].name} === ${this.registers[y].name}`;
-                } else {
-                    log += `No skip as ${this.registers[x].name} !== ${this.registers[y].name}`;
-                }
-            } else if (topByte === 0x6) { // Assign register (0x6XNN)
-                this.registers[x].value = kk;
-    
-                log += `Set ${this.registers[x].name} to ${kk}`;
-            } else if(topByte === 0x7) { // Add NN to VX (0x7XNN)
+            if(topByte === 0x7) { // Add NN to VX (0x7XNN)
                 this.registers[x].value = (this.registers[x].value + kk) % 256; // 8 bit registers
                 
-                log += `Add ${kk} to ${this.registers[x].name}`;
             } else if (topByte === 0x8) { // Mathematical commands
                 switch (n) {
                     case 0: // Set VX to the value of VY

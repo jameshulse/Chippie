@@ -7,7 +7,7 @@
     "dev": "webpack-dev-server --colors --progress --hot",
     "production": "webpack",
     "start": "node server.js",
-    "test": "jest ."
+    "test": "jest . --coverage"
   },
   "dependencies": {
     "babel-core": "^6.26.0",

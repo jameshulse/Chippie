@@ -10,19 +10,19 @@ export function commandMap(params) {
                     return instructions.popStack();
             }
         case 0x1:
-            return instructions.jumpToAddress(params.nnn)
+            return instructions.jumpToAddress(params.nnn);
         case 0x2:
-            return instructions.callRoutine(params.nnn)
+            return instructions.callRoutine(params.nnn);
         case 0x3:
-            break;
+            return instructions.skipIfRegisterEqualsValue(params.x, params.kk);
         case 0x4:
-            break;
+            return instructions.skipIfRegisterNotEqualValue(params.x, params.kk);
         case 0x5:
-            break;
+            return instructions.skipIfRegistersEqual(params.x, params.y);
         case 0x6:
-            break;
+            return instructions.assignValueToRegister(params.x, params.kk);
         case 0x7:
-            break;
+            return instructions.addNumberToRegister(params.x, params.kk);
         case 0x8:
             break;
         case 0x9:
@@ -40,7 +40,7 @@ export function commandMap(params) {
         case 0xF:
             break;
         default:
-            return null;
+            throw new Error('Unknown instruction', params);
     }
 }
 
@@ -59,12 +59,6 @@ export function decode(instruction) {
 export function getCommand(instruction) {
     let params = decode(instruction);
     let command = commandMap(params);
-
-    if (!command) {
-        console.log('Unknown instruction', params);
-        
-        return null;
-    }
 
     return command;
 }
