@@ -319,6 +319,10 @@ export default class Emulator {
 
         this.processTimers();
 
+        if (this.soundTimer > 0) {
+            this.playSound();
+        }
+
         this.log.push(log);
 
         return {
@@ -346,14 +350,8 @@ export default class Emulator {
             this.delayTimer--;
         }
 
-        if (this.soundTimer > 0) {
-             if (this.instructionCount % DELAY_RATIO === 0) {
-                 this.soundTimer--;
-
-                 if (this.soundTimer === 0) {
-                     this.playSound();
-                 }
-             }
+        if (this.soundTimer > 0 && this.instructionCount % DELAY_RATIO === 0) {
+            this.soundTimer--;
         }
     }
 }
