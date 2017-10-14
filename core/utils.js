@@ -1,4 +1,6 @@
 export function padLeft(str, len, char = ' ') {
+    str = str + '';
+
     if (str.length >= len) {
         return str;
     }

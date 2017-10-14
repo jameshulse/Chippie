@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "webpack-dev-server --colors --progress --hot",
     "production": "webpack",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "jest ."
   },
   "dependencies": {
     "babel-core": "^6.26.0",
@@ -17,6 +18,7 @@
     "classnames": "^2.2.5",
     "css-loader": "^0.28.7",
     "express": "^4.16.1",
+    "jest": "^21.2.1",
     "node-sass": "^4.5.3",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
