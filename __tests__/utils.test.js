@@ -20,3 +20,9 @@ describe('Hex', () => {
         expect(utils.hex(43981, 4)).toEqual('0xABCD');
     });
 });
+
+describe('Binary subtract', () => {
+    test('Correct result', () => {
+        expect(utils.binarySubtract(56, 66)).toBe(246);
+    });
+});

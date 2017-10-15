@@ -40,7 +40,7 @@ export function commandMap(params) {
                 case 0x6:
                     return instructions.shiftVyRight(params.x, params.y);
                 case 0x7:
-                    return instructions.subtractVxFromVx(params.x, params.y);
+                    return instructions.subtractVxFromVy(params.x, params.y);
                 case 0xE:
                     return instructions.shiftVyLeft(params.x, params.y);
             }
@@ -55,12 +55,32 @@ export function commandMap(params) {
         case 0xD:
             return instructions.drawSprite(params.x, params.y, params.n);
         case 0xE:
-            break;
+            switch (params.kk) {
+                case 0x9E:
+                    break;
+                case 0xA1:
+                    break;
+            }
         case 0xF:
             switch (params.kk) {
                 case 0x07:
+                    return instructions.setVxToDelayTimer(params.x);
+                case 0x0A:
+                    break; // key op
+                case 0x15:
+                    return instructions.setDelayTimer(params.x);
+                case 0x18:
                     break;
-                
+                case 0x1E:
+                    break;
+                case 0x29:
+                    break;
+                case 0x33:
+                    break;
+                case 0x55:
+                    break;
+                case 0x65:
+                    break;
             }
         default:
             throw new Error('Unknown instruction', params);

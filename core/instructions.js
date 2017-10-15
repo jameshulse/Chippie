@@ -1,3 +1,5 @@
+import { binarySubtract } from './utils';
+
 export function dispClear() {
     return (state) => {
         state.clearScreen();
@@ -175,9 +177,7 @@ export function subtractVyFromVx(x, y) {
         if (state.registers[y].value > state.registers[x].value) {
             state.registers[0xF].value = 1;
             
-            let subtract = (((~state.registers[y].value) << 24) >>> 24) + 1;
-
-            state.registers[x].value = state.registers[x].value + subtract;
+            state.registers[x].value = binarySubtract(state.registers[x].value, state.registers[y].value);
         } else {
             state.registers[0xF].value = 0;
             state.registers[x].value = state.registers[x].value - state.registers[y].value;
@@ -198,9 +198,16 @@ export function shiftVyRight(x, y) {
     };
 };
 
-export function subtractVxFromVx(x, y) {
+export function subtractVxFromVy(x, y) {
     return (state) => {
-        state.registers[x].value = state.registers[y].value - state.registers[x].value;
+        
+        if (state.registers[x].value > state.registers[y].value) {
+            state.registers[x].value = binarySubtract(state.registers[y].value, state.registers[x].value);
+            state.registers[0xF].value = 1;
+        } else {
+            state.registers[x].value = state.registers[y].value - state.registers[x].value;
+            state.registers[0xF].value = 0;
+        }
 
         // log += `Subtract ${this.registers[x].name} from ${this.registers[y].name}`;
     };
@@ -208,12 +215,11 @@ export function subtractVxFromVx(x, y) {
 
 export function shiftVyLeft(x, y) {
     return (state) => {
-        state.registers[0xF].value = (state.registers[y].value & 0x8000) >>> 15;
+        state.registers[0xF].value = (state.registers[y].value & 0x80) >>> 7;
 
-        let value = state.registers[y].value << 1;
+        state.registers[y].value = (state.registers[y].value << 1) % 256;
 
-        state.registers[x].value = value;
-        state.registers[y].value = value;
+        state.registers[x].value = state.registers[y].value;
         
         // log += `Bitwise: ${this.registers[y].name} <<< 1`;
     };
@@ -246,5 +252,17 @@ export function drawSprite(x, y, n) {
         }
 
         // log += `Display sprite at (${x},${y}) of height ${n} from I`;
+    };
+};
+
+export function setVxToDelayTimer(x) {
+    return (state) => {
+        state.registers[x].value = state.delayTimer;
+    };
+};
+
+export function setDelayTimer(x) {
+    return (state) => {
+        state.delayTimer = state.registers[x].value;
     };
 };

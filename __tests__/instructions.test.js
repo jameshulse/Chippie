@@ -8,7 +8,8 @@ let createState = (overrides = {}) => {
         pc: 0,
         stack: [],
         registers: Array(16).fill(null).map(() => new Register()),
-        memoryRegister: new Register()
+        memoryRegister: new Register(),
+        delayTimer: 0
     }, overrides);
 };
 
@@ -268,6 +269,58 @@ describe('Set VX to VY shifted right by 1', () => {
     });
 });
 
+describe('Set VX to VY - VX and set carry if there is a borrow (8XY7)', () => {
+    test('With carry', () => {
+        let state = createState();
+
+        state.registers[0x1].value = 66;
+        state.registers[0x2].value = 56;
+
+        runCommand(0x8127, state);
+
+        expect(state.registers[0x1].value).toBe(246);
+        expect(state.registers[0xF].value).toBe(1);
+    });
+
+    test('No carry', () => {
+        let state = createState();
+
+        state.registers[0x1].value = 56;
+        state.registers[0x2].value = 66;
+
+        runCommand(0x8127, state);
+
+        expect(state.registers[0x1].value).toBe(10);
+        expect(state.registers[0xF].value).toBe(0);
+    });
+});
+
+describe('Shift VY left by 1 and copy to VX (8XYE)', () => {
+    test('Most significant bit is 1', () => {
+        let state = createState();
+
+        state.registers[0x2].value = 129;
+
+        runCommand(0x812E, state);
+
+        expect(state.registers[0x1].value).toBe(2);
+        expect(state.registers[0x2].value).toBe(2);
+        expect(state.registers[0xF].value).toBe(1);
+    });
+
+    test('Most significant bit is 0', () => {
+        let state = createState();
+
+        state.registers[0x2].value = 96;
+
+        runCommand(0x812E, state);
+
+        expect(state.registers[0x1].value).toBe(192);
+        expect(state.registers[0x2].value).toBe(192);
+        expect(state.registers[0xF].value).toBe(0);
+    });
+});
+
 describe('Skip if VX != VY (9XY0)', () => {
     test('Skip', () => {
         let state = createState({ pc: 0x2 });
@@ -324,4 +377,22 @@ test('Assign VX to random number % kk (CXNN)', () => {
     let value = Math.floor((0.5 * 255)) & 0x4;
 
     expect(state.registers[0x1].value).toBe(value);
+});
+
+test('Set VX to delay timer (FX07)', () => {
+    let state = createState({ delayTimer: 12 });
+
+    runCommand(0xF107, state);
+
+    expect(state.registers[0x1].value).toBe(12);
+});
+
+test('Set delay timer to VX (FX15)', () => {
+    let state = createState({ delayTimer: 20 });
+
+    state.registers[0x1].value = 10;
+
+    runCommand(0xF115, state);
+
+    expect(state.delayTimer).toBe(10);
 });
