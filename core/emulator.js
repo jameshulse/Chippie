@@ -82,7 +82,6 @@ export default class Emulator {
         
         let log = `${hex(instruction)}\t`;
 
-
         if (command) {
             command(this);
         } else {
@@ -94,112 +93,7 @@ export default class Emulator {
             let x = (opCode & 0x0F00) >>> 8;
             let y = (opCode & 0x00F0) >>> 4;
 
-            if(topByte === 0x7) { // Add NN to VX (0x7XNN)
-                this.registers[x].value = (this.registers[x].value + kk) % 256; // 8 bit registers
-                
-            } else if (topByte === 0x8) { // Mathematical commands
-                switch (n) {
-                    case 0: // Set VX to the value of VY
-                        this.registers[x].value = this.registers[y].value;
-    
-                        log += `Set ${this.registers[x].name} to value of ${this.registers[y].name}`;
-                        break;
-                    case 1: // Sets VX to VX | VY. (Bitwise OR operation)
-                        this.registers[x].value |= this.registers[y].value;
-    
-                        log += `Bitwise: ${this.registers[x].name} OR ${this.registers[y].name}`;
-                        break;
-                    case 2: // Sets VX to VX & VY. (Bitwise AND operation)
-                        this.registers[x].value &= this.registers[y].value;
-    
-                        log += `Bitwise: ${this.registers[x].name} AND ${this.registers[y].name}`;
-                        break;
-                    case 3: // Sets VX to VX xor VY. (Bitwise XOR operation)
-                        this.registers[x].value ^= this.registers[y].value;
-    
-                        log += `Bitwise: ${this.registers[x].name} XOR ${this.registers[y].name}`;
-                        break;
-                    case 4:
-                        this.registers[x].value += this.registers[y].value;
-    
-                        this.registers[0xF].value = 0; // TODO: Somehow set carry flag
-    
-                        log += `Add ${this.registers[y].name} to ${this.registers[x].name}`;
-                        break;
-                    case 5:
-                        this.registers[x].value -= this.registers[y].value;
-    
-                        this.registers[0xF].value = 0; // TODO: Somehow set carry flag
-    
-                        log += `Subtract ${this.registers[y].name} from ${this.registers[x].name}`;
-                        
-                        break;
-                    case 6: // Sets VX to VY right shifted by 1
-                        this.registers[0xF].value = this.registers[y].value & 0x000F;
-                        this.registers[x].value = this.registers[y].value >>> 1;
-    
-                        log += `Bitwise: ${this.registers[y].name} >>> 1`;
-                        break;
-                    case 7: // Sets VX to VY - VX
-                        this.registers[x].value = this.registers[y].value - this.registers[x].value;
-                        log += `Subtract ${this.registers[x].name} from ${this.registers[y].name}`;
-                        break;
-                    case 0xE: // Sets VX to VY shifted to the left by 1
-                        this.registers[0xF].value = (this.registers[y].value & 0xF000) >>> 12;
-                        this.registers[x].value = this.registers[y].value << 1;
-                        log += `Bitwise: ${this.registers[y].name} <<< 1`;
-                        break;
-                }
-            } else if (topByte === 0x9) { // Skip if VX !== VY
-                if (this.registers[x].value !== this.registers[y].value) {
-                    this.pc += 2;
-    
-                    log += `Skipping as ${this.registers[x].name} === ${this.registers[y].name}`;
-                } else {
-                    log += `Not skipping as ${this.registers[x].name} !== ${this.registers[y].name}`;
-                }
-            } else if (topByte === 0xA) { // Assign memory register (0xANNN)
-                this.memoryRegister.value = nnn;
-    
-                log += `Set I to ${nnn}`;
-            } else if (topByte === 0xB) { // Jump to NNN
-                this.pc = this.registers[0].value + nnn;
-    
-                log += `Jump to V0 + ${nnn}: ${this.pc}`;
-            } else if (topByte === 0xC) { // Rand (0xCXNN)
-                let rand = Math.floor(Math.random() * 255);
-    
-                this.registers[x].value = kk & rand;
-    
-                log += `Randomise ${this.registers[x].name} with ${kk} & rand:${rand}`;
-            } else if(topByte === 0xD) { // Display! 0xDXYN
-                let spriteX = this.registers[x].value;
-                let spriteY = this.registers[y].value;
-                let spriteHeight = opCode & 0x000F;
-    
-                this.registers[0xF].value = 0; // Reset collision register
-    
-                for (let offsetY = 0; offsetY < spriteHeight; offsetY++) {
-                    let spriteLine = this.memory.getUint8(this.memoryRegister.value + offsetY);
-                    
-                    for(let offsetX = 0; offsetX < 8; offsetX++) {
-                        let mask = 1 << offsetX;
-    
-                        if (spriteLine & mask) {
-                            let screenX = (spriteX + (8 - offsetX)) % 64;
-                            let screenY = (spriteY + offsetY) % 32;
-    
-                            if (this.screen[screenY][screenX] === 1) { // Collision
-                                this.registers[0xF].value = 1;
-                            }
-    
-                            this.screen[screenY][screenX] ^= 1;
-                        }
-                    }
-                }
-                
-                log += `Display sprite at (${x},${y}) of height ${spriteHeight} from I`;
-            } else if (topByte === 0xE) { // Handle keyboard input
+            if (topByte === 0xE) { // Handle keyboard input
                 const key = keyMap[this.registers[x].value];
     
                 if (kk === 0x9E) { // Skip the next instruction if the key at X is pressed
@@ -253,12 +147,16 @@ export default class Emulator {
                         for(let i = 0; i <= x; i++) {
                             this.memory.setInt16(this.memoryRegister.value + i, this.registers[i].value);
                         }
+                        
                         log += `Storing values V0 to V${x} in memory`;
                         break;
                     case 0x65: // reg_load Store registers V0 to VX to memory
                         for (let i = 0; i <= x; i++) {
-                            this.registers[i].value = this.memory.getInt16(this.memoryRegister.value + i);
+                            this.memoryRegister.value += i;
+
+                            this.registers[i].value = this.memory.getInt16(this.memoryRegister.value);
                         }
+
                         log += `Storing values V0 to V${x} in memory`;
                         break;
                 }

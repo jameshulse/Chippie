@@ -24,21 +24,44 @@ export function commandMap(params) {
         case 0x7:
             return instructions.addNumberToRegister(params.x, params.kk);
         case 0x8:
-            break;
+            switch (params.n) {
+                case 0x0:
+                    return instructions.assignRegisterToRegister(params.x, params.y);
+                case 0x1:
+                    return instructions.setVxToVxOrVy(params.x, params.y);
+                case 0x2:
+                    return instructions.setVxToVxAndVy(params.x, params.y);
+                case 0x3:
+                    return instructions.setVxToVxXorVy(params.x, params.y);
+                case 0x4:
+                    return instructions.addVyToVxWithCarry(params.x, params.y);
+                case 0x5:
+                    return instructions.subtractVyFromVx(params.x, params.y);
+                case 0x6:
+                    return instructions.shiftVyRight(params.x, params.y);
+                case 0x7:
+                    return instructions.subtractVxFromVx(params.x, params.y);
+                case 0xE:
+                    return instructions.shiftVyLeft(params.x, params.y);
+            }
         case 0x9:
-            break;
+            return instructions.skipIfRegistersNotEqual(params.x, params.y);
         case 0xA:
-            break;
+            return instructions.assignMemoryRegisterToValue(params.nnn);
         case 0xB:
-            break;
+            return instructions.jumpToV0PlusNNN(params.nnn);
         case 0xC:
-            break;
+            return instructions.assignRandomValue(params.x, params.kk);
         case 0xD:
-            break;
+            return instructions.drawSprite(params.x, params.y, params.n);
         case 0xE:
             break;
         case 0xF:
-            break;
+            switch (params.kk) {
+                case 0x07:
+                    break;
+                
+            }
         default:
             throw new Error('Unknown instruction', params);
     }
@@ -49,8 +72,8 @@ export function decode(instruction) {
         command: instruction >>> 12,
         instruction,
         nnn: instruction & 0x0FFF,
-        kk: instruction & 0x0FF,
-        n: instruction & 0x00F,
+        kk: instruction & 0x00FF,
+        n: instruction & 0x000F,
         x: (instruction & 0x0F00) >>> 8,
         y: (instruction & 0x00F0) >>> 4
     };
