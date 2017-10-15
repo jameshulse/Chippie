@@ -432,3 +432,39 @@ test('Binary coded decimal (FX33)', () => {
     expect(state.memory.getUint8(11)).toBe(3);
     expect(state.memory.getUint8(12)).toBe(4);
 });
+
+test('Register dump', () => {
+    let state = createState();
+
+    state.memoryRegister.value = 50;
+
+    state.registers[0x0].value = 10;
+    state.registers[0x1].value = 20;
+    state.registers[0x2].value = 30;
+
+    runCommand(0xF255, state);
+
+    expect(state.memory.getUint8(50)).toBe(10);
+    expect(state.memory.getUint8(51)).toBe(20);
+    expect(state.memory.getUint8(52)).toBe(30);
+
+    expect(state.memoryRegister.value).toBe(53);
+});
+
+test('Register load', () => {
+    let state = createState();
+
+    state.memoryRegister.value = 50;
+
+    state.memory.setUint8(50, 10);
+    state.memory.setUint8(51, 20);
+    state.memory.setUint8(52, 30);
+
+    runCommand(0xF265, state);
+
+    expect(state.registers[0x0].value).toBe(10);
+    expect(state.registers[0x1].value).toBe(20);
+    expect(state.registers[0x2].value).toBe(30);
+
+    expect(state.memoryRegister.value).toBe(53);
+});

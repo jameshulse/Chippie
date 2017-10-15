@@ -295,20 +295,20 @@ export function binaryEncode(x) {
     };
 };
 
-export function registryDump(x) {
+export function registerDump(x) {
     return (state) => {
         for (let i = 0; i <= x; i++) {
-            state.memory.setUint8(state.memoryRegister.value + i, state.registers[i].value);
+            state.memory.setUint8(state.memoryRegister.value, state.registers[i].value);
+            state.memoryRegister.value += 1;
         }
     };
 };
 
-export function registryLoad(x) {
+export function registerLoad(x) {
     return (state) => {
         for (let i = 0; i <= x; i++) {
-            state.memoryRegister.value += i;
-
             state.registers[i].value = state.memory.getUint8(state.memoryRegister.value);
+            state.memoryRegister.value += 1;
         }
     };
 };

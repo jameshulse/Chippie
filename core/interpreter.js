@@ -78,9 +78,9 @@ export function commandMap(params) {
                 case 0x33:
                     return instructions.binaryEncode(params.x);
                 case 0x55:
-                    return instructions.registryDump(params.x);
+                    return instructions.registerDump(params.x);
                 case 0x65:
-                    return instructions.registryLoad(params.x);
+                    return instructions.registerLoad(params.x);
             }
         default:
             throw new Error('Unknown instruction', params);
