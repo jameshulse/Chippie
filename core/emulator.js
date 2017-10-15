@@ -85,13 +85,9 @@ export default class Emulator {
         if (command) {
             command(this);
         } else {
-            let opCode = instruction;
-            let topByte = opCode >>> 12;
-            let nnn = opCode & 0x0FFF;
-            let kk = opCode & 0x0FF;
-            let n = opCode & 0x00F;
-            let x = (opCode & 0x0F00) >>> 8;
-            let y = (opCode & 0x00F0) >>> 4;
+            let topByte = instruction >>> 12;
+            let kk = instruction & 0x0FF;
+            let x = (instruction & 0x0F00) >>> 8;
 
             if (topByte === 0xE) { // Handle keyboard input
                 const key = keyMap[this.registers[x].value];
@@ -115,53 +111,9 @@ export default class Emulator {
                 }
             } else if (topByte === 0xF) {
                 switch (kk) {
-                    case 0x07: // Get value from delay timer (0xFX07)
-                        this.registers[x].value = this.delayTimer;
-                        log += `Set ${this.registers[x].name} to delay timer`;
-                        break;
-                    case 0x0A: // Await for key press
-                        break;
-                    case 0x15:
-                        this.delayTimer = this.registers[x].value;
-                        log += `Set delay timer to ${this.registers[x].name}`;
-                        break;
-                    case 0x18:
-                        this.soundTimer = this.registers[x].value;
-                        log += `Set sound timer to ${this.registers[x].name}`;
-                        break;
-                    case 0x1E:
-                        this.memoryRegister.value += x;
-                        log += `Add ${x} to I`;
-                        break;
-                    case 0x29: // Set I to character font location of register X
-                        this.memoryRegister.value = this.registers[x].value * 5;
-                        log += `Set memory location for character ${hex(this.registers[x].value, 1)}`;
-                        break;
-                    case 0x33: // Binary encoded number
-                        this.memory.setUint8(this.memoryRegister.value, Math.floor(this.registers[x].value / 100));
-                        this.memory.setUint8(this.memoryRegister.value + 1, Math.floor(this.registers[x].value % 100 / 10));
-                        this.memory.setUint8(this.memoryRegister.value + 2, Math.floor(this.registers[x].value % 100 % 10));
-                        log += `Stored binary encoded value of ${this.registers[x].name}`;
-                        break;
-                    case 0x55: // reg_dump - Store registers V0 to VX to memory
-                        for(let i = 0; i <= x; i++) {
-                            this.memory.setInt16(this.memoryRegister.value + i, this.registers[i].value);
-                        }
-                        
-                        log += `Storing values V0 to V${x} in memory`;
-                        break;
-                    case 0x65: // reg_load Store registers V0 to VX to memory
-                        for (let i = 0; i <= x; i++) {
-                            this.memoryRegister.value += i;
-
-                            this.registers[i].value = this.memory.getInt16(this.memoryRegister.value);
-                        }
-
-                        log += `Storing values V0 to V${x} in memory`;
-                        break;
+                    case 0x0A:
+                        break; // Halt until key
                 }
-            } else {
-                debugger;
             }
         }
 
@@ -171,12 +123,13 @@ export default class Emulator {
             this.playSound();
         }
 
-        this.log.push(log);
+        // this.log.push(log);
 
         return {
             screen: this.screen,
             registers: this.registers,
-            log: this.log
+            pc: this.pc
+            // log: this.log
         };
     }
 

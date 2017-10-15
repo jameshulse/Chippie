@@ -15,7 +15,7 @@ export default class EmulatorDisplay extends React.Component {
         this.emulator = new Emulator(this.playSound.bind(this));
         this.keyboard = new Keyboard();
         this.runInterval = null;
-        this.clockDelayMs = 50;
+        this.clockDelayMs = 0;
 
         if (this.props.rom) {
             this.emulator.load(this.props.rom);
@@ -26,7 +26,7 @@ export default class EmulatorDisplay extends React.Component {
             screen: null,
             registers: null,
             log: null,
-            musicEnabled: true
+            musicEnabled: false
         }
     }
 

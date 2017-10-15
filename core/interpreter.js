@@ -57,30 +57,30 @@ export function commandMap(params) {
         case 0xE:
             switch (params.kk) {
                 case 0x9E:
-                    break;
+                    return; // key op
                 case 0xA1:
-                    break;
+                    return; // key op
             }
         case 0xF:
             switch (params.kk) {
                 case 0x07:
                     return instructions.setVxToDelayTimer(params.x);
                 case 0x0A:
-                    break; // key op
+                    return; // key op
                 case 0x15:
                     return instructions.setDelayTimer(params.x);
                 case 0x18:
-                    break;
+                    return instructions.setSoundTimer(params.x);
                 case 0x1E:
-                    break;
+                    return instructions.addVxToMemoryRegister(params.x);
                 case 0x29:
-                    break;
+                    return instructions.setMemoryRegisterToFont(params.x);
                 case 0x33:
-                    break;
+                    return instructions.binaryEncode(params.x);
                 case 0x55:
-                    break;
+                    return instructions.registryDump(params.x);
                 case 0x65:
-                    break;
+                    return instructions.registryLoad(params.x);
             }
         default:
             throw new Error('Unknown instruction', params);

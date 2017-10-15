@@ -9,7 +9,9 @@ let createState = (overrides = {}) => {
         stack: [],
         registers: Array(16).fill(null).map(() => new Register()),
         memoryRegister: new Register(),
-        delayTimer: 0
+        delayTimer: 0,
+        soundTimer: 0,
+        memory: new DataView(new Uint8Array(100).buffer)
     }, overrides);
 };
 
@@ -395,4 +397,38 @@ test('Set delay timer to VX (FX15)', () => {
     runCommand(0xF115, state);
 
     expect(state.delayTimer).toBe(10);
+});
+
+test('Set sound timer to VX (FX18)', () => {
+    let state = createState({ soundTimer: 20 });
+
+    state.registers[0x1].value = 10;
+
+    runCommand(0xF118, state);
+
+    expect(state.soundTimer).toBe(10);
+});
+
+test('Add VX to memory register', () => {
+    let state = createState();
+
+    state.memoryRegister.value = 200;
+    state.registers[0x1].value = 10;
+
+    runCommand(0xF11E, state);
+
+    expect(state.memoryRegister.value).toBe(210);
+});
+
+test('Binary coded decimal (FX33)', () => {
+    let state = createState();
+
+    state.memoryRegister.value = 10
+    state.registers[0x1].value = 234;
+
+    runCommand(0xF133, state);
+
+    expect(state.memory.getUint8(10)).toBe(2);
+    expect(state.memory.getUint8(11)).toBe(3);
+    expect(state.memory.getUint8(12)).toBe(4);
 });

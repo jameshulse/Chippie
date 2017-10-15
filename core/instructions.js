@@ -266,3 +266,49 @@ export function setDelayTimer(x) {
         state.delayTimer = state.registers[x].value;
     };
 };
+
+export function setSoundTimer(x) {
+    return (state) => {
+        state.soundTimer = state.registers[x].value;
+    };
+};
+
+export function addVxToMemoryRegister(x) {
+    return (state) => {
+        state.memoryRegister.value += state.registers[x].value;
+    };
+};
+
+export function setMemoryRegisterToFont(x) {
+    const FONT_WIDTH = 5;
+
+    return (state) => {
+        state.memoryRegister.value = state.registers[x].value * FONT_WIDTH;
+    };
+};
+
+export function binaryEncode(x) {
+    return (state) => {
+        state.memory.setUint8(state.memoryRegister.value, Math.floor(state.registers[x].value / 100));
+        state.memory.setUint8(state.memoryRegister.value + 1, Math.floor(state.registers[x].value % 100 / 10));
+        state.memory.setUint8(state.memoryRegister.value + 2, Math.floor(state.registers[x].value % 100 % 10));
+    };
+};
+
+export function registryDump(x) {
+    return (state) => {
+        for (let i = 0; i <= x; i++) {
+            state.memory.setUint8(state.memoryRegister.value + i, state.registers[i].value);
+        }
+    };
+};
+
+export function registryLoad(x) {
+    return (state) => {
+        for (let i = 0; i <= x; i++) {
+            state.memoryRegister.value += i;
+
+            state.registers[i].value = state.memory.getUint8(state.memoryRegister.value);
+        }
+    };
+};
