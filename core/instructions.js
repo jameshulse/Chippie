@@ -172,11 +172,15 @@ export function addVyToVxWithCarry(x, y) {
 
 export function subtractVyFromVx(x, y) {
     return (state) => {
-        state.registers[x].value -= state.registers;
+        if (state.registers[y].value > state.registers[x].value) {
+            state.registers[0xF].value = 1;
+            
+            let subtract = (((~state.registers[y].value) << 24) >>> 24) + 1;
 
-        if (state.registers[x].value < 0) {
-            state.registers[x].value = 0;
-            state.registers[0xF].value = 1; // Carry flag
+            state.registers[x].value = state.registers[x].value + subtract;
+        } else {
+            state.registers[0xF].value = 0;
+            state.registers[x].value = state.registers[x].value - state.registers[y].value;
         }
 
         // log += `Subtract ${this.registers[y].name} from ${this.registers[x].name}`;
@@ -187,10 +191,8 @@ export function shiftVyRight(x, y) {
     return (state) => {
         state.registers[0xF].value = state.registers[y].value & 0x1;
         
-        let result = this.registers[y].value >>> 1;
-
-        state.registers[x].value = result;
-        state.registers[y].value = result;
+        state.registers[y].value >>>= 1;
+        state.registers[x].value = state.registers[y].value;
 
         // log += `Bitwise: ${this.registers[y].name} >>> 1`;
     };

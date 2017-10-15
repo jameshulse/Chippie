@@ -214,7 +214,59 @@ describe('Set VX to VX + VY with carry (8XY4)', () => {
         expect(state.registers[0xF].value).toBe(0);
         expect(state.registers[0x1].value).toBe(40);
     });
-})
+});
+
+describe('Subtract VY from VX (8XY5', () => {
+    test('With carry', () => {
+        let state = createState();
+
+        state.registers[0x1].value = 56;
+        state.registers[0x2].value = 66;
+
+        runCommand(0x8125, state);
+
+        expect(state.registers[0xF].value).toBe(1);
+        expect(state.registers[0x1].value).toBe(246);
+    });
+
+    test('No carry', () => {
+        let state = createState();
+
+        state.registers[0x1].value = 66;
+        state.registers[0x2].value = 56;
+
+        runCommand(0x8125, state);
+
+        expect(state.registers[0xF].value).toBe(0);
+        expect(state.registers[0x1].value).toBe(10);
+    });
+});
+
+describe('Set VX to VY shifted right by 1', () => {
+    test('Shift with 1 in least significant position', () => {
+        let state = createState();
+
+        state.registers[0x2].value = 3;
+
+        runCommand(0x8126, state);
+
+        expect(state.registers[0x1].value).toBe(1);
+        expect(state.registers[0x2].value).toBe(1);
+        expect(state.registers[0xF].value).toBe(1);
+    });
+
+    test('Shift with 0 in least significant position', () => {
+        let state = createState();
+
+        state.registers[0x2].value = 16;
+        
+        runCommand(0x8126, state);
+
+        expect(state.registers[0x1].value).toBe(8);
+        expect(state.registers[0x2].value).toBe(8);
+        expect(state.registers[0xF].value).toBe(0);
+    });
+});
 
 describe('Skip if VX != VY (9XY0)', () => {
     test('Skip', () => {
