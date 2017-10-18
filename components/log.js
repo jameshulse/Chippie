@@ -10,11 +10,19 @@ export default class Log extends React.Component {
     }
 
     componentDidUpdate() {
-        // this.scrollToBottom();
+        this.scrollToHighlight();
     }
 
-    scrollToBottom() {
-        this.container.scrollTop = this.container.scrollHeight;
+    scrollToHighlight() {
+        let line = this.container.getElementsByClassName('log__line--highlight')[0];
+
+        if (!line) {
+            return;
+        }
+
+        let lineOffset = line.offsetTop - this.container.offsetTop;
+
+        this.container.scrollTop = lineOffset;
     }
 
     render() {

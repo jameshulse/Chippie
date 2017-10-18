@@ -45,7 +45,6 @@ export default class Emulator {
         this.instructionCount = 0;
         this.interval = null;
         this.loaded = false;
-        this.log = [];
         this.pc = MEMORY_START;
         this.registers.forEach((register) => register.value = 0);
         this.running = false;
@@ -108,9 +107,10 @@ export default class Emulator {
         this.pc += 2;
         
         let execute = interpreter(instruction);
-        let log = `${hex(instruction)}\t`;
 
-        execute(this);
+        if (execute) {
+            execute(this);
+        }
 
         this.processTimers();
 
@@ -123,7 +123,6 @@ export default class Emulator {
             registers: this.registers,
             pc: this.pc,
             sourceIndex: (this.pc - 0x200) / 2
-            // log: this.log
         };
     }
 

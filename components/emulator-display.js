@@ -102,9 +102,7 @@ export default class EmulatorDisplay extends React.Component {
     }
 
     changeRom() {
-        this.stop(() => {
-            this.props.changeRom();
-        });
+        this.props.changeRom();
     }
 
     toggleMusic() {
@@ -121,7 +119,7 @@ export default class EmulatorDisplay extends React.Component {
             <section className="section emulator">
                 <div className="columns">
                     <div className="column is-one-third">
-                        <button onClick={this.changeRom.bind(this)} className="button is-link is-pulled-right">Change ROM</button>
+                        <button disabled={isRunning} onClick={this.changeRom.bind(this)} className="button is-link is-pulled-right">Change ROM</button>
 
                         <Title size={3}>{ this.props.rom.name }</Title>
                         
