@@ -12,21 +12,24 @@ export default class EmulatorDisplay extends React.Component {
     constructor(props) {
         super(props);
 
-        this.emulator = new Emulator(this.playSound.bind(this));
+        this.emulator = new Emulator(this.playSound.bind(this), this.repaint.bind(this));
         this.keyboard = new Keyboard();
         this.runInterval = null;
         this.clockDelayMs = 0;
 
-        if (this.props.rom) {
-            this.emulator.load(this.props.rom);
-        }
-
         this.state = {
             isRunning: false,
-            screen: null,
-            registers: null,
             log: null,
-            musicEnabled: false
+            musicEnabled: false,
+            registers: null,
+            screen: null,
+            sourceIndex: 0
+        };
+
+        if (this.props.rom) {
+            let log = this.emulator.load(this.props.rom);
+
+            this.state.log = log;
         }
     }
 
@@ -38,9 +41,19 @@ export default class EmulatorDisplay extends React.Component {
         }
     }
 
+    repaint(screen) {
+        this.setState((prev) => ({
+            ...prev,
+            screen
+        }));
+    }
+
     componentWillUpdate(nextProps) {
         if(nextProps.rom !== this.props.rom) {
-            this.emulator.load(nextProps.rom);
+            this.setState((prev) => ({
+                ...prev,
+                log
+            }));
         }
     }
 
@@ -57,9 +70,7 @@ export default class EmulatorDisplay extends React.Component {
             ...prev,
             isRunning: true
         }), () => {
-            this.runInterval = setInterval(() => {
-                this.step();
-            }, this.clockDelayMs);
+            this.emulator.run();
         });
     }
 
@@ -68,16 +79,12 @@ export default class EmulatorDisplay extends React.Component {
             ...prev,
             isRunning: false
         }), () => {
-            clearInterval(this.runInterval);
-
-            if (onStop) {
-                onStop();
-            }
+            this.emulator.stop();
         });
     }
 
     step() {
-        let emulatorState = this.emulator.step(this.keyboard.getKeysDown());
+        let emulatorState = this.emulator.cycle();
 
         this.setState((prev) => ({
             ...prev,
@@ -86,7 +93,12 @@ export default class EmulatorDisplay extends React.Component {
     }
 
     reset() {
-        this.emulator.load(this.props.rom);
+        let log = this.emulator.load(this.props.rom);
+
+        this.setState((prev) => ({
+            ...prev,
+            log
+        }));
     }
 
     changeRom() {
@@ -103,12 +115,12 @@ export default class EmulatorDisplay extends React.Component {
     }
 
     render() {
-        const { isRunning, musicEnabled } = this.state;
+        const { isRunning, musicEnabled, sourceIndex } = this.state;
 
         return (
             <section className="section emulator">
                 <div className="columns">
-                    <div className="column is-third">
+                    <div className="column is-one-third">
                         <button onClick={this.changeRom.bind(this)} className="button is-link is-pulled-right">Change ROM</button>
 
                         <Title size={3}>{ this.props.rom.name }</Title>
@@ -134,15 +146,15 @@ export default class EmulatorDisplay extends React.Component {
                         </div>
                     </div>
 
-                    <div className="column is-third">
+                    <div className="column is-one-third">
                         <Title size={6}>Registers</Title>
                         <Registers className="is-pulled-left" registers={this.emulator.registers.slice(0, 8)} />
                         <Registers registers={this.emulator.registers.slice(8)} />
                     </div>
 
-                    <div className="column is-third">
+                    <div className="column is-one-third">
                         <Title size={6}>Log</Title>
-                        <Log log={this.state.log} />
+                        <Log log={this.state.log} highlightIndex={sourceIndex} />
                     </div>
                 </div>
             </section>

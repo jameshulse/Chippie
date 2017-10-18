@@ -32,6 +32,15 @@
     overflow: scroll;
     max-height: 400px;
     width: 100%;
+
+    .log__line {
+        padding: 0 5px;
+        line-height: 1.5em;
+
+        &--highlight {
+            background: rgba(50, 115, 220, 0.5);
+        }
+    }
 }
 
 input[type=number] {

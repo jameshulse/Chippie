@@ -4,6 +4,8 @@ export function commandMap(params) {
     switch (params.command) {
         case 0x0:
             switch (params.instruction) {
+                case 0x0000:
+                    return; // Ignore for now: seen in Tetris ROM
                 case 0x00E0:
                     return instructions.dispClear();
                 case 0x00EE:
@@ -57,16 +59,16 @@ export function commandMap(params) {
         case 0xE:
             switch (params.kk) {
                 case 0x9E:
-                    return; // key op
+                    return instructions.skipIfKeyPressed(params.x);
                 case 0xA1:
-                    return; // key op
+                    return instructions.skipIfKeyNotPressed(params.x);
             }
         case 0xF:
             switch (params.kk) {
                 case 0x07:
                     return instructions.setVxToDelayTimer(params.x);
                 case 0x0A:
-                    return; // key op
+                    return instructions.waitForKey(params.x);
                 case 0x15:
                     return instructions.setDelayTimer(params.x);
                 case 0x18:

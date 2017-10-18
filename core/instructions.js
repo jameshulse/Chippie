@@ -312,3 +312,25 @@ export function registerLoad(x) {
         }
     };
 };
+
+export function waitForKey(x) {
+    return (state) => {
+        state.waitKey = state.registers[x].value;
+    };
+};
+
+export function skipIfKeyPressed(x) {
+    return (state) => {
+        if(false/* TODO */) {
+            state.pc += 2;
+        }
+    };
+};
+
+export function skipIfKeyNotPressed(x) {
+    return (state) => {
+        if (false/* TODO */) {
+            state.pc += 2;
+        }
+    };
+};

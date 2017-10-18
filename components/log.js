@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 export default class Log extends React.Component {
     constructor(props) {
@@ -9,7 +10,7 @@ export default class Log extends React.Component {
     }
 
     componentDidUpdate() {
-        this.scrollToBottom();
+        // this.scrollToBottom();
     }
 
     scrollToBottom() {
@@ -18,7 +19,16 @@ export default class Log extends React.Component {
 
     render() {
         let { log } = this.props;
-        let renderLine = (line, i) => <p key={i}>{line}</p>;
+        let renderLine = (line, i) => {
+            const classes = classNames([
+                'log__line',
+                { 'log__line--highlight': this.props.highlightIndex === i }
+            ]);
+
+            return (
+                <p className={classes} key={i}>{line}</p>
+            );
+        }
 
         return (
             <div className="log" ref={c => this.container = c}>
