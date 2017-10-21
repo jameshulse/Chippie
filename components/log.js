@@ -26,7 +26,8 @@ export default class Log extends React.Component {
     }
 
     render() {
-        let { log } = this.props;
+        let { lines } = this.props;
+        
         let renderLine = (line, i) => {
             const classes = classNames([
                 'log__line',
@@ -40,7 +41,7 @@ export default class Log extends React.Component {
 
         return (
             <div className="log" ref={c => this.container = c}>
-                { log && log.slice(-this.maxLength).map(renderLine) }
+                {lines && lines.slice(-this.maxLength).map(renderLine) }
             </div>
         );
     }
