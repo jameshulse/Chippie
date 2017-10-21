@@ -13,11 +13,11 @@ describe('Pad left', () => {
 
 describe('Hex', () => {
     test('Pads to length', () => {
-        expect(utils.hex(15, 4)).toEqual('0x000F');
+        expect(utils.formatHex(15, 4)).toEqual('0x000F');
     });
 
     test('Doesn\'t pad when equal to length', () => {
-        expect(utils.hex(43981, 4)).toEqual('0xABCD');
+        expect(utils.formatHex(43981, 4)).toEqual('0xABCD');
     });
 });
 

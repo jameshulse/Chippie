@@ -12,8 +12,9 @@ export default class EmulatorDisplay extends React.Component {
     constructor(props) {
         super(props);
 
-        this.emulator = new Emulator(this.playSound.bind(this), this.repaint.bind(this));
         this.keyboard = new Keyboard();
+        
+        this.emulator = new Emulator(this.playSound.bind(this), this.repaint.bind(this), this.keyboard);
         this.runInterval = null;
         this.clockDelayMs = 0;
 

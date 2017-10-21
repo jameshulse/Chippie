@@ -3,6 +3,7 @@ export default class Keyboard {
         this.keys = {};
         this.keyDown = this.keyDown.bind(this);
         this.keyUp = this.keyUp.bind(this);
+        this.keyCallback = null;
     }
 
     attach() {
@@ -21,6 +22,11 @@ export default class Keyboard {
         }
 
         this.keys[e.key] = true;
+
+        if (this.keyCallback) {
+            this.keyCallback(e.key);
+            this.keyCallback = null;
+        }
     }
 
     keyUp(e) {
@@ -29,6 +35,10 @@ export default class Keyboard {
         }
         
         this.keys[e.key] = false;
+    }
+
+    onNextKeyPress(callback) {
+        this.keyCallback = callback;
     }
 
     getKeysDown() {

@@ -1,26 +1,29 @@
-import { binarySubtract } from './utils';
+import { binarySubtract, randomInt } from './utils';
+import keyMap from './keymap';
+
+export function noop() {
+    return (state) => {
+        state.pc = (state.pc + 2) & 0x0FFF;
+    }
+}
 
 export function dispClear() {
     return (state) => {
         state.clearScreen();
-
-        // log += 'Clear screen';
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function popStack() {
     return (state) => {
-        state.stack.pop();
-
-        // log += `Return from subroutine to ${this.programCounter}`;
+        state.pc = state.stack.pop();
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function jumpToAddress(nnn) {
     return (state) => {
-        state.pc = nnn;
-
-        // log += `Goto ${nnn}`;
+        state.pc = nnn & 0x0FFF;
     };
 };
 
@@ -29,18 +32,15 @@ export function callRoutine(nnn) {
         state.stack.push(state.pc);
 
         state.pc = nnn;
-
-        // log += `Call subroutine @ ${nnn}`;
     };
 }
 
 export function skipIfRegisterEqualsValue(x, kk) {
     return (state) => {
         if (state.registers[x].value === kk) {
-            state.pc += 2;
-            // log += `Skip next as ${this.registers[x].name} === ${kk}`;
+            state.pc = (state.pc + 4) & 0x0FFF;
         } else {
-            // log += `No skip as ${this.registers[x].name} !== ${kk}`;
+            state.pc = (state.pc + 2) & 0x0FFF;
         }
     };
 };
@@ -48,11 +48,9 @@ export function skipIfRegisterEqualsValue(x, kk) {
 export function skipIfRegisterNotEqualValue(x, kk) {
     return (state) => {
         if (state.registers[x].value !== kk) {
-            state.pc += 2;
-
-            // log += `Skip next as ${this.registers[x].name} !== ${kk}`;
+            state.pc = (state.pc + 4) & 0x0FFF;
         } else {
-            // log += `No skip as ${this.registers[x].name} === ${kk}`;
+            state.pc = (state.pc + 2) & 0x0FFF;
         }
     };
 };
@@ -60,11 +58,9 @@ export function skipIfRegisterNotEqualValue(x, kk) {
 export function skipIfRegistersEqual(x, y) {
     return (state) => {
         if (state.registers[x].value === state.registers[y].value) {
-            state.pc += 2;
-
-            // log += `Skip next as ${this.registers[x].name} === ${this.registers[y].name}`;
+            state.pc = (state.pc + 4) & 0x0FFF;
         } else {
-            // log += `No skip as ${this.registers[x].name} !== ${this.registers[y].name}`;
+            state.pc = (state.pc + 2) & 0x0FFF;
         }
     };
 };
@@ -72,8 +68,7 @@ export function skipIfRegistersEqual(x, y) {
 export function assignValueToRegister(x, kk) {
     return (state) => {
         state.registers[x].value = kk;
-
-        // log += `Set ${this.registers[x].name} to ${kk}`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
@@ -82,29 +77,26 @@ export function addNumberToRegister(x, kk) {
         state.registers[x].value += kk;
 
         if (state.registers[x].value > 255) {
-            throw new Error('Register overflow'); // TODO: Maybe modulo
+            state.registers[x].value %= 256;
         }
 
-        // log += `Add ${kk} to ${this.registers[x].name}`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function assignRegisterToRegister(x, y) {
     return (state) => {
         state.registers[x].value = state.registers[y].value;
-
-        // log += `Set ${this.registers[x].name} to value of ${this.registers[y].name}`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function skipIfRegistersNotEqual(x, y) {
     return (state) => {
         if (state.registers[x].value !== state.registers[y].value) {
-            state.pc += 2;
-
-            // log += `Skipping as ${this.registers[x].name} === ${this.registers[y].name}`;
+            state.pc = (state.pc + 4) & 0x0FFF;
         } else {
-            // log += `Not skipping as ${this.registers[x].name} !== ${this.registers[y].name}`;
+            state.pc = (state.pc + 2) & 0x0FFF;
         }
     };
 };
@@ -112,50 +104,41 @@ export function skipIfRegistersNotEqual(x, y) {
 export function assignMemoryRegisterToValue(nnn) {
     return (state) => {
         state.memoryRegister.value = nnn;
-
-        // log += `Set I to ${nnn}`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     }
 }
 
 export function jumpToV0PlusNNN(nnn) {
     return (state) => {
         state.pc = state.registers[0].value + nnn;
-
-        // log += `Jump to V0 + ${nnn}: ${this.pc}`;
     };
 };
 
 export function assignRandomValue(x, kk) {
     return (state) => {
-        let rand = Math.floor(Math.random() * 255);
-
-        state.registers[x].value = rand & kk;
-
-        // log += `Randomise ${this.registers[x].name} with ${kk} & rand:${rand}`;
+        state.registers[x].value = randomInt(255) & kk;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function setVxToVxOrVy(x, y) {
     return (state) => {
         state.registers[x].value = state.registers[x].value | state.registers[y].value;
-
-        // log += `Bitwise: ${this.registers[x].name} OR ${this.registers[y].name}`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function setVxToVxAndVy(x, y) {
     return (state) => {
         state.registers[x].value &= state.registers[y].value;
-
-        // log += `Bitwise: ${this.registers[x].name} AND ${this.registers[y].name}`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 ;}
 
 export function setVxToVxXorVy(x, y) {
     return (state) => {
         state.registers[x].value ^= state.registers[y].value;
-
-        // log += `Bitwise: ${this.registers[x].name} XOR ${this.registers[y].name}`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
@@ -168,7 +151,7 @@ export function addVyToVxWithCarry(x, y) {
             state.registers[0xF].value = 1; // Carry flag
         }
 
-        // log += `Add ${this.registers[y].name} to ${this.registers[x].name}`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
@@ -183,18 +166,17 @@ export function subtractVyFromVx(x, y) {
             state.registers[x].value = state.registers[x].value - state.registers[y].value;
         }
 
-        // log += `Subtract ${this.registers[y].name} from ${this.registers[x].name}`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function shiftVyRight(x, y) {
     return (state) => {
         state.registers[0xF].value = state.registers[y].value & 0x1;
-        
         state.registers[y].value >>>= 1;
         state.registers[x].value = state.registers[y].value;
 
-        // log += `Bitwise: ${this.registers[y].name} >>> 1`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
@@ -209,19 +191,17 @@ export function subtractVxFromVy(x, y) {
             state.registers[0xF].value = 0;
         }
 
-        // log += `Subtract ${this.registers[x].name} from ${this.registers[y].name}`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function shiftVyLeft(x, y) {
     return (state) => {
         state.registers[0xF].value = (state.registers[y].value & 0x80) >>> 7;
-
         state.registers[y].value = (state.registers[y].value << 1) % 256;
-
         state.registers[x].value = state.registers[y].value;
-        
-        // log += `Bitwise: ${this.registers[y].name} <<< 1`;
+
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
@@ -251,31 +231,35 @@ export function drawSprite(x, y, n) {
             }
         }
 
-        // log += `Display sprite at (${x},${y}) of height ${n} from I`;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function setVxToDelayTimer(x) {
     return (state) => {
         state.registers[x].value = state.delayTimer;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function setDelayTimer(x) {
     return (state) => {
         state.delayTimer = state.registers[x].value;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function setSoundTimer(x) {
     return (state) => {
         state.soundTimer = state.registers[x].value;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function addVxToMemoryRegister(x) {
     return (state) => {
         state.memoryRegister.value += state.registers[x].value;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
@@ -284,6 +268,7 @@ export function setMemoryRegisterToFont(x) {
 
     return (state) => {
         state.memoryRegister.value = state.registers[x].value * FONT_WIDTH;
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
@@ -292,6 +277,7 @@ export function binaryEncode(x) {
         state.memory.setUint8(state.memoryRegister.value, Math.floor(state.registers[x].value / 100));
         state.memory.setUint8(state.memoryRegister.value + 1, Math.floor(state.registers[x].value % 100 / 10));
         state.memory.setUint8(state.memoryRegister.value + 2, Math.floor(state.registers[x].value % 100 % 10));
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
@@ -301,6 +287,8 @@ export function registerDump(x) {
             state.memory.setUint8(state.memoryRegister.value, state.registers[i].value);
             state.memoryRegister.value += 1;
         }
+
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
@@ -310,27 +298,49 @@ export function registerLoad(x) {
             state.registers[i].value = state.memory.getUint8(state.memoryRegister.value);
             state.memoryRegister.value += 1;
         }
+
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function waitForKey(x) {
     return (state) => {
-        state.waitKey = state.registers[x].value;
+        state.halted = true;
+
+        state.keyboard.onNextKeyPress((key) => {
+            state.halted = false;
+            state.registers[x].value = keyMap.filter(k => keyMap[k] === key);
+        });
+
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function skipIfKeyPressed(x) {
     return (state) => {
-        if(false/* TODO */) {
-            state.pc += 2;
+        let keys = state.keyboard.getKeysDown();
+        let key = keyMap[state.registers[x].value];
+
+        if(keys.indexOf(key) !== -1) {
+            console.log(`Key down ${key}. Skipping.`);
+
+            state.pc = (state.pc + 4) & 0x0FFF;
         }
+
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function skipIfKeyNotPressed(x) {
     return (state) => {
-        if (false/* TODO */) {
-            state.pc += 2;
+        let keys = state.keyboard.getKeysDown();
+        let key = keyMap[state.registers[x].value];
+
+        if (keys.indexOf(key) === -1) {
+            console.log(`Key not down ${key}`);
+            state.pc = (state.pc + 4) & 0x0FFF;
         }
+
+        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
