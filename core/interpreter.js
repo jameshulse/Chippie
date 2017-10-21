@@ -14,6 +14,8 @@ export function commandMap(params) {
                 case 0x00EE:
                     params.commandText = 'return';
                     return instructions.popStack();
+                default:
+                    return instructions.noop();
             }
         case 0x1:
             params.commandText = `goto ${formatHex(params.nnn)}`;
@@ -65,6 +67,8 @@ export function commandMap(params) {
                 case 0xE:
                     params.commandText = `V${hex(params.x)} = V${hex(params.y)} << 1`;
                     return instructions.shiftVyLeft(params.x, params.y);
+                default:
+                    return instructions.noop();
             }
         case 0x9:
             params.commandText = `if (V${hex(params.x)} != V${hex(params.y)})`;
@@ -121,7 +125,6 @@ export function commandMap(params) {
                     return instructions.registerLoad(params.x);
             }
         default:
-            params.commandText = `Unknown: ${formatHex(params.instruction)}`;
             return instructions.noop();
     }
 }

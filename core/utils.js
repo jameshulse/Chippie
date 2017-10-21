@@ -22,5 +22,5 @@ export function binarySubtract(left, right) {
 }
 
 export function randomInt(min, max) {
-    return Math.floor(Math.random() * 255) + min;
+    return Math.floor(Math.random() * max) + min;
 }

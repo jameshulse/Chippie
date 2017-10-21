@@ -152,7 +152,7 @@ export default class EmulatorDisplay extends React.Component {
                     </div>
 
                     <div className="column is-one-third">
-                        <Title size={6}>Log</Title>
+                        <Title size={6}>Debugger</Title>
                         <Log log={this.state.log} highlightIndex={sourceIndex} />
                     </div>
                 </div>

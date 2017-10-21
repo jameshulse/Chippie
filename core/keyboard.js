@@ -41,6 +41,10 @@ export default class Keyboard {
         this.keyCallback = callback;
     }
 
+    isKeyPressed(key) {
+        return !!this.keys[key];
+    }
+
     getKeysDown() {
         return Object.getOwnPropertyNames(this.keys).filter(k => this.keys[k]);
     }

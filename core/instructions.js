@@ -116,7 +116,7 @@ export function jumpToV0PlusNNN(nnn) {
 
 export function assignRandomValue(x, kk) {
     return (state) => {
-        state.registers[x].value = randomInt(255) & kk;
+        state.registers[x].value = randomInt(0, 256) & kk;
         state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
@@ -231,6 +231,8 @@ export function drawSprite(x, y, n) {
             }
         }
 
+        state.repaint(state.screen);
+
         state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
@@ -310,21 +312,17 @@ export function waitForKey(x) {
         state.keyboard.onNextKeyPress((key) => {
             state.halted = false;
             state.registers[x].value = keyMap.filter(k => keyMap[k] === key);
+            state.pc = (state.pc + 2) & 0x0FFF;
         });
-
-        state.pc = (state.pc + 2) & 0x0FFF;
     };
 };
 
 export function skipIfKeyPressed(x) {
     return (state) => {
-        let keys = state.keyboard.getKeysDown();
         let key = keyMap[state.registers[x].value];
 
-        if(keys.indexOf(key) !== -1) {
-            console.log(`Key down ${key}. Skipping.`);
-
-            state.pc = (state.pc + 4) & 0x0FFF;
+        if (state.keyboard.isKeyPressed(key)) {
+            state.pc = (state.pc + 2) & 0x0FFF;
         }
 
         state.pc = (state.pc + 2) & 0x0FFF;
@@ -333,12 +331,10 @@ export function skipIfKeyPressed(x) {
 
 export function skipIfKeyNotPressed(x) {
     return (state) => {
-        let keys = state.keyboard.getKeysDown();
         let key = keyMap[state.registers[x].value];
 
-        if (keys.indexOf(key) === -1) {
-            console.log(`Key not down ${key}`);
-            state.pc = (state.pc + 4) & 0x0FFF;
+        if (!state.keyboard.isKeyPressed(key)) {
+            state.pc = (state.pc + 2) & 0x0FFF;
         }
 
         state.pc = (state.pc + 2) & 0x0FFF;

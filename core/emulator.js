@@ -71,17 +71,21 @@ export default class Emulator {
     run() {
         this.running = true;
 
-        this.interval = setInterval(() => {
-            let result = this.cycle();
+        let frame = () => {
+            for (let i = 0; i < 10; i++) {
+                this.cycle();
+            }
 
-            this.repaint(result.screen);
-        }, 0);
+            this.interval = requestAnimationFrame(frame);
+        }
+
+        this.interval = requestAnimationFrame(frame);
     }
 
     stop() {
         this.running = false;
 
-        clearInterval(this.interval);
+        cancelAnimationFrame(this.interval);
     }
 
     cycle() {

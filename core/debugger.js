@@ -10,7 +10,7 @@ export const parse = (rom) => {
         let params = decode(instruction);
         let command = commandMap(params);
 
-        source.push(`${formatHex(i + 0x200)}:\t${params.commandText || ''}`);
+        source.push(`${formatHex(i + 0x200)}:\t${formatHex(instruction)}\t${params.commandText || ''}`);
     }
 
     return source;
