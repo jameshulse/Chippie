@@ -30,7 +30,7 @@ export default class App extends React.Component {
                         <Title className="navbar-item" size={2}>Chippie</Title>
                     </div>
                 </nav>
-                <div className="container">
+                <div className="container is-widescreen">
                     {
                         rom ? <Emulator rom={rom} changeRom={this.clearRom.bind(this)} />
                             : <RomSelect onSelect={this.romSelected.bind(this)} />
