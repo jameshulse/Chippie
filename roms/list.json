@@ -4,15 +4,27 @@
         { "name": "Airplane", "file": "Airplane.ch8" },
         { "name": "Animal Race", "file": "Animal Race.ch8" },
         { "name": "Breakout", "file": "Breakout.ch8" },
+        { "name": "Blitz", "file": "Blitz.ch8" },
+        { "name": "Cave", "file": "Cave.ch8" },
+        { "name": "Lunar Lander", "file": "Lunar Lander.ch8" },
         { "name": "Pong", "file": "Pong.ch8" },
+        { "name": "Puzzle", "file": "Puzzle.ch8" },
         { "name": "Rocket Launch", "file": "Rocket Launch.ch8" },
         { "name": "Tank", "file": "Tank.ch8" },
         { "name": "Tetris", "file": "Tetris.ch8" },
-        { "name": "Worm", "file": "Worm.ch8" }
+        { "name": "Timebomb", "file": "Timebomb.ch8" },
+        { "name": "Tron", "file": "Tron.ch8" },
+        { "name": "Space Invaders", "file": "Space Invaders.ch8" },
+        { "name": "Space Flight", "file": "Space Flight.ch8" },
+        { "name": "Soccer", "file": "Soccer.ch8" },
+        { "name": "Worm", "file": "Worm.ch8" },
+        { "name": "X-Mirror", "file": "X-Mirror.ch8" }
     ],
     "programs": [
         { "name": "Chip8 Picture", "file": "Chip8 Picture.ch8" },
-        { "name": "IBM Logo", "file": "IBM Logo.ch8" }
+        { "name": "IBM Logo", "file": "IBM Logo.ch8" },
+        { "name": "Fishie", "file": "Fishie.ch8" },
+        { "name": "Life", "file": "Life.ch8" }
     ],
     "demos": [
         { "name": "Maze", "file": "Maze.ch8" },
